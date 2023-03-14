@@ -1,17 +1,15 @@
 #pragma once
 
-#include "Enemy.h"
+#include "Item.h"
 
-class Skeleton : public Enemy
+class Gem : public Item
 {
+
 public:
 	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override;
-	void update(int deltaTime) override;
 
 	glm::ivec2 getBoundingBoxMax() override;
 	glm::ivec2 getBoundingBoxMin() override;
 
-private:
-	bool goLeft = true;
 };
 

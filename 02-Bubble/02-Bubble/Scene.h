@@ -7,6 +7,9 @@
 #include "TileMap.h"
 #include "Player.h"
 #include "Skeleton.h"
+#include "Sprite.h"
+#include "Texture.h"
+#include "StaticSprite.h"
 
 
 // Scene contains all the entities of our game.
@@ -28,14 +31,19 @@ public:
 
 private:
 	void initShaders();
+	//void checkFloor(const glm::ivec2& playerPosition);
+	//void printFloor(int x, int y);
 
 private:
 	TileMap *map;
 	Player *player;
 	Skeleton* enemy;
+	Texture spritesheet;
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
+	Sprite* floorSprite;
+	bool bprintFloor;
 
 };
 

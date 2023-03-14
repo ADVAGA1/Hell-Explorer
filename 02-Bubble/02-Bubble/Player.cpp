@@ -10,6 +10,9 @@
 #define JUMP_HEIGHT 96
 #define FALL_STEP 4
 
+#define HITBOX_X 16
+#define HITBOX_Y 16
+
 
 enum PlayerAnims
 {
@@ -91,7 +94,7 @@ void Player::update(int deltaTime)
 		else
 		{
 			posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
-			if(jumpAngle > 90)
+			if (jumpAngle > 90)
 				bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
 		}
 	}
@@ -130,6 +133,14 @@ void Player::setPosition(const glm::vec2 &pos)
 
 glm::ivec2 Player::getPosition(){
 	return posPlayer;
+}
+
+glm::ivec2 Player::getBoundingBoxMax() {
+	return posPlayer + glm::ivec2(HITBOX_X, HITBOX_Y);
+}
+
+glm::ivec2 Player::getBoundingBoxMin() {
+	return posPlayer + glm::ivec2(-HITBOX_X, -HITBOX_Y);
 }
 
 

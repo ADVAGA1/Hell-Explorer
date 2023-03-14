@@ -1,6 +1,8 @@
 #include "Skeleton.h"
 
 #define FALL_STEP 4
+#define HITBOX_X 8
+#define HITBOX_Y 16
 
 enum EnemyAnims {
 	MOVE_LEFT, MOVE_RIGHT
@@ -60,8 +62,8 @@ void Skeleton::update(int deltaTime)
 	posEnemy.y += FALL_STEP;
 
 	glm::ivec2 posNext;
-	if (goLeft) posNext = posEnemy + glm::ivec2(-30, 0);
-	else posNext = posEnemy + glm::ivec2(30, 0);
+	if (goLeft) posNext = posEnemy + glm::ivec2(-24, 0);
+	else posNext = posEnemy + glm::ivec2(24, 0);
 
 	if (!map->collisionMoveDown(posNext, glm::ivec2(32, 32), &posEnemy.y))
 	{
@@ -76,4 +78,12 @@ void Skeleton::update(int deltaTime)
 	}
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+}
+
+
+glm::ivec2 Skeleton::getBoundingBoxMax() {
+	return posEnemy + glm::ivec2(HITBOX_X,HITBOX_Y);
+}
+glm::ivec2 Skeleton::getBoundingBoxMin() {
+	return posEnemy + glm::ivec2(-HITBOX_X, -HITBOX_Y);
 }

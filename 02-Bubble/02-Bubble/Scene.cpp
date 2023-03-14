@@ -9,10 +9,10 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 4
-#define INIT_PLAYER_Y_TILES 25
+#define INIT_PLAYER_Y_TILES 24
 
-#define INIT_ENEMY_X_TILES 10
-#define INIT_ENEMY_Y_TILES 20
+#define INIT_ENEMY_X_TILES 20
+#define INIT_ENEMY_Y_TILES 24
 
 
 Scene::Scene()
@@ -20,6 +20,8 @@ Scene::Scene()
 	map = NULL;
 	player = NULL;
 	enemy = NULL;
+	floorSprite = NULL;
+	bprintFloor = false;
 }
 
 Scene::~Scene()
@@ -28,7 +30,12 @@ Scene::~Scene()
 		delete map;
 	if(player != NULL)
 		delete player;
-	if (enemy != NULL) delete enemy;
+	if (enemy != NULL)
+		delete enemy;
+	if (floorSprite != NULL) {
+		floorSprite->free();
+		delete floorSprite;
+	}
 }
 
 
@@ -44,16 +51,29 @@ void Scene::init()
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
+	
+	spritesheet.loadFromFile("images/tilesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	floorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.1, 0.1), &spritesheet, &texProgram);
+	
+	floorSprite->setNumberAnimations(1);
+	floorSprite->setAnimationSpeed(1, 8);
+	floorSprite->addKeyframe(1, glm::vec2(0.3f, 0.2f));
+	floorSprite->changeAnimation(1);
+	
+
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 }
 
 bool Scene::collisionPlayerEnemy(Player* player, Enemy* enemy) {
+
+	glm::ivec2 boundingBoxMaxPlayer = player->getBoundingBoxMax();
+	glm::ivec2 boundingBoxMinPlayer = player->getBoundingBoxMin();
+	glm::ivec2 boundingBoxMaxEnemy = enemy->getBoundingBoxMax();
+	glm::ivec2 boundingBoxMinEnemy = enemy->getBoundingBoxMin();
+
 	
-	glm::ivec2 posPlayer = player->getPosition();
-	glm::ivec2 posEnemy = enemy->getPosition();
-	
-	//if (posPlayer.y == posEnemy.y && (posPlayer.x + 16 > posEnemy.x - 16 || posPlayer.x - 16 < posEnemy.x + 16)) return true;
+	if (boundingBoxMinPlayer.x < boundingBoxMaxEnemy.x && boundingBoxMinEnemy.x < boundingBoxMaxPlayer.x && boundingBoxMinPlayer.y < boundingBoxMaxEnemy.y && boundingBoxMinEnemy.y < boundingBoxMaxPlayer.y) return true;
 	return false;
 }
 
@@ -62,7 +82,8 @@ void Scene::update(int deltaTime)
 
 	currentTime += deltaTime;
 
-	if (collisionPlayerEnemy(player, enemy)) Game::instance().keyPressed(27);
+	if (collisionPlayerEnemy(player, enemy)) player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
+
 
 	player->update(deltaTime);
 	enemy->update(deltaTime);
@@ -78,9 +99,20 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+
 	map->render();
 	player->render();
-	enemy-> render();
+	enemy->render();
+	
+	auto& floor = map->getFloor();
+	
+	for (auto it = floor.begin(); it != floor.end(); ++it) {
+		if (it->second) {
+			floorSprite->setPosition(glm::vec2(it->first.first * map->getTileSize() + SCREEN_X, it->first.second * map->getTileSize() + SCREEN_Y));
+			floorSprite->render();
+		}
+	}
+
 }
 
 void Scene::initShaders()

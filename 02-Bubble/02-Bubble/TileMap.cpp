@@ -3,9 +3,12 @@
 #include <sstream>
 #include <vector>
 #include "TileMap.h"
+#include <map>
 
 
 using namespace std;
+
+#define CHANGEABLE_TILE 2
 
 
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
@@ -50,7 +53,7 @@ bool TileMap::loadLevel(const string &levelFile)
 	ifstream fin;
 	string line, tilesheetFile;
 	stringstream sstream;
-	char tile;
+	int tile;
 	
 	fin.open(levelFile.c_str());
 	if(!fin.is_open())
@@ -82,16 +85,15 @@ bool TileMap::loadLevel(const string &levelFile)
 	{
 		for(int i=0; i<mapSize.x; i++)
 		{
-			fin.get(tile);
-			if(tile == ' ')
+			fin >> tile;
+
+			if (tile == CHANGEABLE_TILE) floor.insert(pair<pair<int, int>, bool>(pair<int, int>(i, j), false));
+
+			if(tile == 0)
 				map[j*mapSize.x+i] = 0;
 			else
-				map[j*mapSize.x+i] = tile - int('0');
+				map[j*mapSize.x+i] = tile;
 		}
-		fin.get(tile);
-#ifndef _WIN32
-		fin.get(tile);
-#endif
 	}
 	fin.close();
 	
@@ -183,7 +185,7 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	return false;
 }
 
-bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
+bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY)
 {
 	int x0, x1, y;
 	
@@ -197,17 +199,28 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 			if(*posY - tileSize * y + size.y <= 4)
 			{
 				*posY = tileSize * y - size.y;
+
+				checkFloor(x, y);
+
 				return true;
 			}
-			return true;
 		}
 	}
 	
 	return false;
 }
 
+void TileMap::checkFloor(int x, int y) {
 
+	auto it = floor.find(pair<int, int>(x, y));
+	if (it != floor.end()) {
+		floor[pair<int, int>(x, y)] = true;
+	}
+}
 
+std::map<pair<int,int>,bool>& TileMap::getFloor() {
+	return floor;
+}
 
 
 

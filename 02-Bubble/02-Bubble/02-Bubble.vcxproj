@@ -19,6 +19,7 @@
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="StaticSprite.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
@@ -33,6 +34,7 @@
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Skeleton.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="StaticSprite.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TileMap.cpp" />
   </ItemGroup>

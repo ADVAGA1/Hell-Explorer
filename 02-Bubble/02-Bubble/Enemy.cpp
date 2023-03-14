@@ -5,11 +5,6 @@
 #include "Enemy.h"
 #include "Game.h"
 
-
-enum EnemyAnims {
-	MOVE_LEFT, MOVE_RIGHT
-};
-
 void Enemy::render()
 {
 	sprite->render();
