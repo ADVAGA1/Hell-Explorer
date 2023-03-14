@@ -4,7 +4,7 @@
 #define HITBOX_Y 8
 
 void Gem::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
-	spritesheet.loadFromFile("images/skeleton.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	/*spritesheet.loadFromFile("images/skeleton.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0 / 4.0, 1.0 / 5.0), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(2);
 
@@ -32,6 +32,7 @@ void Gem::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posItem.x), float(tileMapDispl.y + posItem.y)));
+*/
 }
 
 

@@ -52,13 +52,13 @@ void Scene::init()
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
 	
-	spritesheet.loadFromFile("images/tilesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	spritesheet.loadFromFile("images/tileset.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	floorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.1, 0.1), &spritesheet, &texProgram);
 	
 	floorSprite->setNumberAnimations(1);
-	floorSprite->setAnimationSpeed(1, 8);
-	floorSprite->addKeyframe(1, glm::vec2(0.3f, 0.2f));
-	floorSprite->changeAnimation(1);
+	floorSprite->setAnimationSpeed(0, 8);
+	floorSprite->addKeyframe(0, glm::vec2(0.2f, 0.f));
+	floorSprite->changeAnimation(0);
 	
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
@@ -83,7 +83,6 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 
 	if (collisionPlayerEnemy(player, enemy)) player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
-
 
 	player->update(deltaTime);
 	enemy->update(deltaTime);

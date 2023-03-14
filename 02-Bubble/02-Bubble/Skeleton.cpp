@@ -82,7 +82,7 @@ void Skeleton::update(int deltaTime)
 
 
 glm::ivec2 Skeleton::getBoundingBoxMax() {
-	return posEnemy + glm::ivec2(HITBOX_X,HITBOX_Y);
+	return posEnemy + glm::ivec2(HITBOX_X, HITBOX_Y);
 }
 glm::ivec2 Skeleton::getBoundingBoxMin() {
 	return posEnemy + glm::ivec2(-HITBOX_X, -HITBOX_Y);

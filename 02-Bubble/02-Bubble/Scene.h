@@ -31,8 +31,6 @@ public:
 
 private:
 	void initShaders();
-	//void checkFloor(const glm::ivec2& playerPosition);
-	//void printFloor(int x, int y);
 
 private:
 	TileMap *map;

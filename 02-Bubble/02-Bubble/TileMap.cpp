@@ -9,6 +9,9 @@
 using namespace std;
 
 #define CHANGEABLE_TILE 2
+#define WALL_LEFT 44
+#define WALL_RIGHT 41
+#define PILAR 19
 
 
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
@@ -188,7 +191,8 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY)
 {
 	int x0, x1, y;
-	
+	bool result = false;
+
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
 	y = (pos.y + size.y - 1) / tileSize;
@@ -202,12 +206,12 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 
 				checkFloor(x, y);
 
-				return true;
+				result = true;
 			}
 		}
 	}
 	
-	return false;
+	return result;
 }
 
 void TileMap::checkFloor(int x, int y) {
