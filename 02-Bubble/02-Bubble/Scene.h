@@ -10,6 +10,7 @@
 #include "Sprite.h"
 #include "Texture.h"
 #include "StaticSprite.h"
+#include "Coin.h"
 
 
 // Scene contains all the entities of our game.
@@ -28,6 +29,7 @@ public:
 	void render();
 	
 	bool collisionPlayerEnemy(Player* player, Enemy* enemy);
+	bool collisionPlayerItem(Player* player, Item* item);
 
 private:
 	void initShaders();
@@ -37,11 +39,14 @@ private:
 	Player *player;
 	Skeleton* enemy;
 	Texture spritesheet;
+	Texture backgroundTexture;
+	Sprite* background;
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
 	Sprite* floorSprite;
-	bool bprintFloor;
+	Coin* coin;
+	bool openDoor;
 
 };
 

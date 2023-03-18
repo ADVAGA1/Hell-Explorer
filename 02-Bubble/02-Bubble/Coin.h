@@ -2,7 +2,7 @@
 
 #include "Item.h"
 
-class Gem : public Item
+class Coin : public Item
 {
 
 public:

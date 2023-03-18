@@ -12,6 +12,7 @@ using namespace std;
 #define WALL_LEFT 44
 #define WALL_RIGHT 41
 #define PILAR 19
+#define ROOF 63
 
 
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
@@ -156,7 +157,7 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 // Method collisionMoveDown also corrects Y coordinate if the box is
 // already intersecting a tile below.
 
-bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
+bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping) const
 {
 	int x, y0, y1;
 	
@@ -165,14 +166,16 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		int tile = map[y * mapSize.x + x];
+		
+		if(collidable(tile, jumping))
 			return true;
 	}
 	
 	return false;
 }
 
-bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const
+bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping) const
 {
 	int x, y0, y1;
 	
@@ -181,14 +184,16 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		int tile = map[y * mapSize.x + x];
+
+		if (collidable(tile, jumping))
 			return true;
 	}
 	
 	return false;
 }
 
-bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY)
+bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool player)
 {
 	int x0, x1, y;
 	bool result = false;
@@ -204,7 +209,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 			{
 				*posY = tileSize * y - size.y;
 
-				checkFloor(x, y);
+				if(player) checkFloor(x, y);
 
 				result = true;
 			}
@@ -214,16 +219,38 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	return result;
 }
 
+bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY, bool jumping) {
+	int y0, y1, x;
+	bool result = false;
+
+	y0 = pos.y / tileSize;
+	y1 = (pos.y + size.y - 1) / tileSize;
+	x = (pos.x + size.x - 1) / tileSize;
+	for (int y = y0; y <= y1; y++)
+	{
+		int tile = map[y * mapSize.x + x];
+		if (collidable(tile,jumping)) result = true;
+	}
+
+	return result;
+}
+
+
 void TileMap::checkFloor(int x, int y) {
 
-	auto it = floor.find(pair<int, int>(x, y));
+	auto it = floor.find({x, y});
 	if (it != floor.end()) {
-		floor[pair<int, int>(x, y)] = true;
+		floor[{x, y}] = true;
 	}
 }
 
 std::map<pair<int,int>,bool>& TileMap::getFloor() {
 	return floor;
+}
+
+bool TileMap::collidable(int tile, bool jumping) const {
+	if (jumping) return tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == PILAR;
+	return tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == PILAR || tile == CHANGEABLE_TILE;
 }
 
 

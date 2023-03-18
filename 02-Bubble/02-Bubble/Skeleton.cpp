@@ -45,14 +45,14 @@ void Skeleton::update(int deltaTime)
 	sprite->update(deltaTime);
 
 	if (goLeft) {
-		if (!map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32))) {
+		if (!map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32),false)) {
 			if (sprite->animation() != MOVE_LEFT) sprite->changeAnimation(MOVE_LEFT);
 			posEnemy.x -= 1;
 		}
 		else goLeft = !goLeft;
 	}
 	else {
-		if (!map->collisionMoveRight(posEnemy, glm::ivec2(32, 32))) {
+		if (!map->collisionMoveRight(posEnemy, glm::ivec2(32, 32),false)) {
 			if (sprite->animation() != MOVE_RIGHT) sprite->changeAnimation(MOVE_RIGHT);
 			posEnemy.x += 1;
 		}
@@ -62,10 +62,10 @@ void Skeleton::update(int deltaTime)
 	posEnemy.y += FALL_STEP;
 
 	glm::ivec2 posNext;
-	if (goLeft) posNext = posEnemy + glm::ivec2(-24, 0);
-	else posNext = posEnemy + glm::ivec2(24, 0);
+	if (goLeft) posNext = posEnemy + glm::ivec2(-20, 0);
+	else posNext = posEnemy + glm::ivec2(32, 0);
 
-	if (!map->collisionMoveDown(posNext, glm::ivec2(32, 32), &posEnemy.y))
+	if (!map->collisionMoveDown(posNext, glm::ivec2(32, 32), &posEnemy.y, false))
 	{
 		posEnemy.y = startY;
 		if (goLeft) {

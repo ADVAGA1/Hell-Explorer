@@ -31,9 +31,10 @@ public:
 	
 	int getTileSize() const { return tileSize; }
 
-	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY);
+	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping) const;
+	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping) const;
+	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool player);
+	bool collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY, bool jumping);
 
 	std::map<pair<int, int>, bool>& getFloor();
 	
@@ -41,6 +42,7 @@ private:
 	bool loadLevel(const string &levelFile);
 	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
 	void checkFloor(int x, int y);
+	bool collidable(int tile, bool jumping) const;
 
 private:
 	GLuint vao;

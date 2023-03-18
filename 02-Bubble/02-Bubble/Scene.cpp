@@ -11,7 +11,7 @@
 #define INIT_PLAYER_X_TILES 4
 #define INIT_PLAYER_Y_TILES 24
 
-#define INIT_ENEMY_X_TILES 20
+#define INIT_ENEMY_X_TILES 22
 #define INIT_ENEMY_Y_TILES 24
 
 
@@ -21,7 +21,8 @@ Scene::Scene()
 	player = NULL;
 	enemy = NULL;
 	floorSprite = NULL;
-	bprintFloor = false;
+	coin = NULL;
+	openDoor = false;
 }
 
 Scene::~Scene()
@@ -36,6 +37,7 @@ Scene::~Scene()
 		floorSprite->free();
 		delete floorSprite;
 	}
+	if (coin != NULL) delete coin;
 }
 
 
@@ -52,14 +54,22 @@ void Scene::init()
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
 	
+	backgroundTexture.loadFromFile("images/background1.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	background = Sprite::createSprite(glm::vec2(16*36, 16*28), glm::vec2(1, 1), &backgroundTexture, &texProgram);
+	background->setPosition(glm::vec2(SCREEN_X, SCREEN_Y));
+
 	spritesheet.loadFromFile("images/tileset.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	floorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.1, 0.1), &spritesheet, &texProgram);
-	
+
 	floorSprite->setNumberAnimations(1);
 	floorSprite->setAnimationSpeed(0, 8);
 	floorSprite->addKeyframe(0, glm::vec2(0.2f, 0.f));
 	floorSprite->changeAnimation(0);
 	
+	coin = new Coin();
+	coin->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	coin->setPosition(glm::vec2(INIT_ENEMY_X_TILES * map->getTileSize(), INIT_ENEMY_Y_TILES * map->getTileSize()));
+	coin->setTileMap(map);
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
@@ -77,15 +87,28 @@ bool Scene::collisionPlayerEnemy(Player* player, Enemy* enemy) {
 	return false;
 }
 
+bool Scene::collisionPlayerItem(Player* player, Item* item) {
+	glm::ivec2 boundingBoxMaxPlayer = player->getBoundingBoxMax();
+	glm::ivec2 boundingBoxMinPlayer = player->getBoundingBoxMin();
+	glm::ivec2 boundingBoxMaxItem = item->getBoundingBoxMax();
+	glm::ivec2 boundingBoxMinItem = item->getBoundingBoxMin();
+
+
+	if (boundingBoxMinPlayer.x < boundingBoxMaxItem.x && boundingBoxMinItem.x < boundingBoxMaxPlayer.x && boundingBoxMinPlayer.y < boundingBoxMaxItem.y && boundingBoxMinItem.y < boundingBoxMaxPlayer.y) return true;
+	return false;
+}
+
 void Scene::update(int deltaTime)
 {
 
 	currentTime += deltaTime;
 
 	if (collisionPlayerEnemy(player, enemy)) player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
+	if (collisionPlayerItem(player, coin)) delete coin;
 
 	player->update(deltaTime);
 	enemy->update(deltaTime);
+	coin->update(deltaTime);
 }
 
 void Scene::render()
@@ -99,9 +122,15 @@ void Scene::render()
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
+	background->render();
+
+	texProgram.setUniformMatrix4f("modelview", modelview);
+	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+
 	map->render();
 	player->render();
 	enemy->render();
+	coin->render();
 	
 	auto& floor = map->getFloor();
 	
@@ -109,7 +138,12 @@ void Scene::render()
 		if (it->second) {
 			floorSprite->setPosition(glm::vec2(it->first.first * map->getTileSize() + SCREEN_X, it->first.second * map->getTileSize() + SCREEN_Y));
 			floorSprite->render();
+			//floor.erase(it);
 		}
+	}
+
+	if (floor.size() == 0) {
+		openDoor = true;
 	}
 
 }
