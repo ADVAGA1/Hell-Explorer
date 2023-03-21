@@ -24,6 +24,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
 	lives = 5;
 	bJumping = false;
+	godMode = false;
 	spritesheet.loadFromFile("images/player.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0/8.0, 0.20), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(8);
@@ -114,7 +115,7 @@ void Player::update(int deltaTime)
 	
 	if(bJumping)
 	{
-		if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y,bJumping)) {
+		if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32),bJumping)) {
 			bJumping = false;
 			posPlayer.y = startY;
 		}
@@ -185,6 +186,10 @@ int Player::getLives() {
 
 void Player::setLives(int newLives) {
 	lives = newLives;
+}
+
+bool Player::isGodMode() {
+	return godMode;
 }
 
 

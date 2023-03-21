@@ -53,8 +53,10 @@ private:
 	Coin* coin;
 	Key* key;
 	Door* door;
-	bool openDoor, keyTaken, coinTaken;
+	bool openDoor, keyTaken, coinTaken, keySpawn;
 	vector<Lava*> lavas;
+	Sprite* heart;
+	Texture heartTexture;
 
 };
 

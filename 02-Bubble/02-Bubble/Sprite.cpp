@@ -48,6 +48,20 @@ void Sprite::update(int deltaTime)
 	}
 }
 
+void Sprite::updateLoopless(int deltaTime) {
+	if (currentAnimation >= 0)
+	{
+		timeAnimation += deltaTime;
+		while (timeAnimation > animations[currentAnimation].millisecsPerKeyframe)
+		{
+			timeAnimation -= animations[currentAnimation].millisecsPerKeyframe;
+			currentKeyframe = currentKeyframe + 1;
+			if ((unsigned int) currentKeyframe >= animations[currentAnimation].keyframeDispl.size()) --currentKeyframe;
+		}
+		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
+	}
+}
+
 void Sprite::render() const
 {
 	glm::mat4 modelview = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 0.f));

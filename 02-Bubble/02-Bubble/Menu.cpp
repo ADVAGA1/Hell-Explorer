@@ -4,9 +4,6 @@
 #include "Game.h"
 #include <GL/glut.h>
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-
 Menu::~Menu() {
 	if (background != NULL) delete background;
 	if(cursorSprite != NULL) delete cursorSprite;
@@ -33,6 +30,35 @@ void Menu::init() {
 void Menu::update(int deltaTime) {
 
 	currentTime += deltaTime;
+
+	switch (cursor)
+	{
+	case CursorType::PLAY:
+		cursorSprite->setPosition(glm::vec2(260, 220));
+		break;
+	case CursorType::INSTRUCTIONS:
+		cursorSprite->setPosition(glm::vec2(505, 310));
+		break;
+	case CursorType::CREDITS:
+		cursorSprite->setPosition(glm::vec2(415, 380));
+		break;
+	case CursorType::EXIT:
+		cursorSprite->setPosition(glm::vec2(200, 430));
+		break;
+	default:
+		break;
+	}
+
+	if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+		--cursor;
+		if (cursor < 0) cursor = -3 * cursor;
+	}
+
+	if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+		++cursor;
+	}
+
+	cursor = cursor % 4;
 
 	cursorSprite->update(deltaTime);
 
@@ -89,23 +115,4 @@ int Menu::getCursor() {
 
 void Menu::setCursor(int c) {
 	cursor = c;
-	switch (cursor)
-	{
-	case CursorType::PLAY:
-		cursorSprite->setPosition(glm::vec2(260, 220));
-		break;
-	case CursorType::INSTRUCTIONS:
-		cursorSprite->setPosition(glm::vec2(505, 310));
-		break;
-	case CursorType::CREDITS:
-		cursorSprite->setPosition(glm::vec2(415, 380));
-		break;
-	case CursorType::EXIT:
-		cursorSprite->setPosition(glm::vec2(200, 430));
-		break;
-	default:
-		break;
-	}
-
-
 }

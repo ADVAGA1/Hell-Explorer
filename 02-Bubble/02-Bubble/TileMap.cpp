@@ -221,7 +221,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	return result;
 }
 
-bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY, bool jumping) {
+bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, bool jumping) {
 	int y0, y1, x;
 	bool result = false;
 

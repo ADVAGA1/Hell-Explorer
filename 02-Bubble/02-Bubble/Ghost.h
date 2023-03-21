@@ -14,5 +14,6 @@ public:
 private:
 	bool goLeft = true;
 	bool goUp = true;
+	bool hasMoved;
 };
 

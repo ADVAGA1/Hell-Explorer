@@ -3,10 +3,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
 #include "Game.h"
+#include "Scene.h"
 
 
-#define SCREEN_X 32
-#define SCREEN_Y 32
+#define SCREEN_X 64
+#define SCREEN_Y 64
 
 #define INIT_PLAYER_X_TILES 4
 #define INIT_PLAYER_Y_TILES 24
@@ -33,6 +34,9 @@ Scene::Scene()
 	coin = NULL;
 	key = NULL;
 	door = NULL;
+
+	for (auto& l : lavas) l = NULL;
+
 	keyTaken = false;
 	openDoor = false;
 	coinTaken = false;
@@ -52,6 +56,9 @@ Scene::~Scene()
 	}
 	if (coin != NULL) delete coin;
 	if (door != NULL) delete door;
+	for (auto& l : lavas) {
+		if (l != NULL) delete l;
+	}
 }
 
 
@@ -94,6 +101,13 @@ void Scene::init()
 	door->setPosition(glm::vec2(INIT_DOOR_X_TILES * map->getTileSize(), INIT_DOOR_Y_TILES * map->getTileSize()));
 	door->setTileMap(map);
 
+	heartTexture.loadFromFile("images/heart.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	heart = Sprite::createSprite(glm::vec2(32, 32), glm::vec2(1, 1), &heartTexture, &texProgram);
+	heart->setNumberAnimations(1);
+	heart->setAnimationSpeed(0, 8);
+	heart->addKeyframe(0, glm::vec2(0, 0));
+	heart->changeAnimation(0);
+
 	vector<pair<int, int>> lavaMap = map->getLavaMap();
 	for (auto& coord : lavaMap) {
 		Lava* l = new Lava();
@@ -103,12 +117,15 @@ void Scene::init()
 		lavas.push_back(l);
 	}
 
+
+
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 
 	keyTaken = false;
 	openDoor = false;
 	coinTaken = false;
+	keySpawn = false;
 
 }
 
@@ -142,6 +159,10 @@ void Scene::update(int deltaTime)
 
 	if (Game::instance().getKey('r')) reset();
 
+	if (Game::instance().getKey('k')) {
+		keySpawn = true;
+	}
+
 	if (collisionPlayerEnemy(player, enemy)) {
 		player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 		if (player->getLives() == 1) {
@@ -166,7 +187,7 @@ void Scene::update(int deltaTime)
 
 	if (collisionPlayerItem(player, key)) {
 		keyTaken = true;
-		door->openedDoor();
+		door->openDoor();
 	}
 
 	if (keyTaken && collisionPlayerItem(player, door)) {
@@ -196,6 +217,11 @@ void Scene::render()
 
 	background->render();
 
+	for (int i = 0; i < player->getLives(); ++i) {
+		heart->setPosition(glm::ivec2(16+32*i,4));
+		heart->render();
+	}
+
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
@@ -222,7 +248,9 @@ void Scene::render()
 		}
 	}
 
-	if (changedFloors == 0 && !keyTaken) {
+	if (changedFloors == 0) keySpawn = true;
+
+	if (keySpawn && !keyTaken) {
 		key->setPosition(glm::vec2(INIT_KEY_X_TILES * map->getTileSize(), INIT_KEY_Y_TILES * map->getTileSize()));
 		key->render();
 	}

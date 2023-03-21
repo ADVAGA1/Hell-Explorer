@@ -6,11 +6,11 @@
 #include "Menu.h"
 
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
-enum SceneType {
-	MENU_SCENE, INSTRUCTIONS_SCENE, CREDITS_SCENE, SCENE_1
+enum class SceneType {
+	MENU, INSTRUCTIONS, CREDITS, SCENE_1
 };
 
 
@@ -54,7 +54,7 @@ private:
 	Scene scene;                      // Scene to render
 	bool keys[256], specialKeys[256]; // Store key states so that 
 	                                  // we can have access at any time
-	int currentScene;
+	SceneType currentScene;
 	Menu menu;
 
 };

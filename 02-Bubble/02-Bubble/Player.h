@@ -27,6 +27,8 @@ public:
 
 	int getLives();
 	void setLives(int newLives);
+
+	bool isGodMode();
 	
 private:
 	bool bJumping;
@@ -36,6 +38,7 @@ private:
 	Sprite *sprite;
 	TileMap *map;
 	int lives;
+	bool godMode;
 
 };
 
