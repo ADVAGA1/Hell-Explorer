@@ -13,6 +13,7 @@ using namespace std;
 #define WALL_RIGHT 41
 #define PILAR 19
 #define ROOF 63
+#define LAVA 20
 
 
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
@@ -92,6 +93,7 @@ bool TileMap::loadLevel(const string &levelFile)
 			fin >> tile;
 
 			if (tile == CHANGEABLE_TILE) floor.insert(pair<pair<int, int>, bool>(pair<int, int>(i, j), false));
+			if (tile == LAVA) lavaMap.push_back({i, j});
 
 			if(tile == 0)
 				map[j*mapSize.x+i] = 0;
@@ -251,6 +253,10 @@ std::map<pair<int,int>,bool>& TileMap::getFloor() {
 bool TileMap::collidable(int tile, bool jumping) const {
 	if (jumping) return tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == PILAR;
 	return tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == PILAR || tile == CHANGEABLE_TILE;
+}
+
+vector<pair<int,int>>& TileMap::getLavaMap() {
+	return lavaMap;
 }
 
 

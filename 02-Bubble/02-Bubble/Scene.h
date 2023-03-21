@@ -11,6 +11,9 @@
 #include "Texture.h"
 #include "StaticSprite.h"
 #include "Coin.h"
+#include "Key.h"
+#include "Door.h"
+#include "Lava.h"
 
 
 // Scene contains all the entities of our game.
@@ -33,6 +36,7 @@ public:
 
 private:
 	void initShaders();
+	void reset();
 
 private:
 	TileMap *map;
@@ -46,7 +50,10 @@ private:
 	glm::mat4 projection;
 	Sprite* floorSprite;
 	Coin* coin;
-	bool openDoor;
+	Key* key;
+	Door* door;
+	bool openDoor, keyTaken, coinTaken;
+	vector<Lava*> lavas;
 
 };
 

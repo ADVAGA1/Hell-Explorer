@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "ShaderProgram.h"
 #include <map>
+#include <vector>
 
 
 // Class Tilemap is capable of loading a tile map from a text file in a very
@@ -37,6 +38,7 @@ public:
 	bool collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY, bool jumping);
 
 	std::map<pair<int, int>, bool>& getFloor();
+	vector<pair<int, int>>& getLavaMap();
 	
 private:
 	bool loadLevel(const string &levelFile);
@@ -55,6 +57,7 @@ private:
 	glm::vec2 tileTexSize;
 	int *map;
 	std::map<pair<int, int>, bool> floor;
+	std::vector<pair<int, int>> lavaMap;
 
 };
 

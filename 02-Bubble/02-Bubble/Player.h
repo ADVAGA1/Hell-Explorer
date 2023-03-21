@@ -24,6 +24,9 @@ public:
 
 	glm::ivec2 getBoundingBoxMax();
 	glm::ivec2 getBoundingBoxMin();
+
+	int getLives();
+	void setLives(int newLives);
 	
 private:
 	bool bJumping;
@@ -32,6 +35,7 @@ private:
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
+	int lives;
 
 };
 

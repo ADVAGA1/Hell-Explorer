@@ -22,8 +22,9 @@ enum PlayerAnims
 
 void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
+	lives = 5;
 	bJumping = false;
-	spritesheet.loadFromFile("images/spritesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	spritesheet.loadFromFile("images/player.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0/8.0, 0.20), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(8);
 	
@@ -176,6 +177,14 @@ glm::ivec2 Player::getBoundingBoxMax() {
 
 glm::ivec2 Player::getBoundingBoxMin() {
 	return posPlayer + glm::ivec2(-HITBOX_X, -HITBOX_Y);
+}
+
+int Player::getLives() {
+	return lives;
+}
+
+void Player::setLives(int newLives) {
+	lives = newLives;
 }
 
 

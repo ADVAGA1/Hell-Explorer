@@ -6,13 +6,22 @@
 
 
 #define SCREEN_X 32
-#define SCREEN_Y 16
+#define SCREEN_Y 32
 
 #define INIT_PLAYER_X_TILES 4
 #define INIT_PLAYER_Y_TILES 24
 
 #define INIT_ENEMY_X_TILES 22
 #define INIT_ENEMY_Y_TILES 24
+
+#define INIT_COIN_X_TILES 12
+#define INIT_COIN_Y_TILES 24
+
+#define INIT_KEY_X_TILES 4
+#define INIT_KEY_Y_TILES 24
+
+#define INIT_DOOR_X_TILES 20
+#define INIT_DOOR_Y_TILES 2
 
 
 Scene::Scene()
@@ -22,7 +31,11 @@ Scene::Scene()
 	enemy = NULL;
 	floorSprite = NULL;
 	coin = NULL;
+	key = NULL;
+	door = NULL;
+	keyTaken = false;
 	openDoor = false;
+	coinTaken = false;
 }
 
 Scene::~Scene()
@@ -38,6 +51,7 @@ Scene::~Scene()
 		delete floorSprite;
 	}
 	if (coin != NULL) delete coin;
+	if (door != NULL) delete door;
 }
 
 
@@ -68,11 +82,34 @@ void Scene::init()
 	
 	coin = new Coin();
 	coin->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	coin->setPosition(glm::vec2(INIT_ENEMY_X_TILES * map->getTileSize(), INIT_ENEMY_Y_TILES * map->getTileSize()));
+	coin->setPosition(glm::vec2(INIT_COIN_X_TILES * map->getTileSize(), INIT_COIN_Y_TILES * map->getTileSize()));
 	coin->setTileMap(map);
+
+	key = new Key();
+	key->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	key->setTileMap(map);
+
+	door = new Door();
+	door->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	door->setPosition(glm::vec2(INIT_DOOR_X_TILES * map->getTileSize(), INIT_DOOR_Y_TILES * map->getTileSize()));
+	door->setTileMap(map);
+
+	vector<pair<int, int>> lavaMap = map->getLavaMap();
+	for (auto& coord : lavaMap) {
+		Lava* l = new Lava();
+		l->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		l->setPosition(glm::vec2(coord.first * map->getTileSize(), coord.second * map->getTileSize()));
+		l->setTileMap(map);
+		lavas.push_back(l);
+	}
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
+
+	keyTaken = false;
+	openDoor = false;
+	coinTaken = false;
+
 }
 
 bool Scene::collisionPlayerEnemy(Player* player, Enemy* enemy) {
@@ -103,12 +140,47 @@ void Scene::update(int deltaTime)
 
 	currentTime += deltaTime;
 
-	if (collisionPlayerEnemy(player, enemy)) player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
-	if (collisionPlayerItem(player, coin)) delete coin;
+	if (Game::instance().getKey('r')) reset();
+
+	if (collisionPlayerEnemy(player, enemy)) {
+		player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
+		if (player->getLives() == 1) {
+			reset();
+		}
+		else player->setLives(player->getLives() - 1);
+	}
+
+	for (unsigned int i = 0; i < lavas.size(); ++i) {
+		if (collisionPlayerEnemy(player, lavas[i])) {
+			player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
+			if (player->getLives() == 1) {
+				reset();
+			}
+			else player->setLives(player->getLives() - 1);
+		}
+	}
+
+	if (collisionPlayerItem(player, coin)) {
+		coinTaken = true;
+	}
+
+	if (collisionPlayerItem(player, key)) {
+		keyTaken = true;
+		door->openedDoor();
+	}
+
+	if (keyTaken && collisionPlayerItem(player, door)) {
+		reset();
+	}
 
 	player->update(deltaTime);
 	enemy->update(deltaTime);
 	coin->update(deltaTime);
+	door->update(deltaTime);
+
+	for (auto& l : lavas) {
+		l->update(deltaTime);
+	}
 }
 
 void Scene::render()
@@ -128,23 +200,35 @@ void Scene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
 	map->render();
-	player->render();
-	enemy->render();
-	coin->render();
+
+	for (auto& l : lavas) {
+		l->render();
+	}
+
+	door->render();
+
+	if(!coinTaken) coin->render();
+
 	
 	auto& floor = map->getFloor();
 	
-	for (auto it = floor.begin(); it != floor.end(); ++it) {
+	int changedFloors = floor.size();
+
+	for (auto it = floor.begin(); it != floor.end() && changedFloors > 0; ++it) {
 		if (it->second) {
 			floorSprite->setPosition(glm::vec2(it->first.first * map->getTileSize() + SCREEN_X, it->first.second * map->getTileSize() + SCREEN_Y));
 			floorSprite->render();
-			//floor.erase(it);
+			--changedFloors;
 		}
 	}
 
-	if (floor.size() == 0) {
-		openDoor = true;
+	if (changedFloors == 0 && !keyTaken) {
+		key->setPosition(glm::vec2(INIT_KEY_X_TILES * map->getTileSize(), INIT_KEY_Y_TILES * map->getTileSize()));
+		key->render();
 	}
+
+	enemy->render();
+	player->render();
 
 }
 
@@ -176,6 +260,10 @@ void Scene::initShaders()
 	texProgram.bindFragmentOutput("outColor");
 	vShader.free();
 	fShader.free();
+}
+
+void Scene::reset() {
+	init();
 }
 
 
