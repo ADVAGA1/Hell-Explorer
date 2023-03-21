@@ -14,6 +14,7 @@
 #include "Key.h"
 #include "Door.h"
 #include "Lava.h"
+#include "Ghost.h"
 
 
 // Scene contains all the entities of our game.
@@ -41,7 +42,7 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	Skeleton* enemy;
+	Ghost* enemy;
 	Texture spritesheet;
 	Texture backgroundTexture;
 	Sprite* background;

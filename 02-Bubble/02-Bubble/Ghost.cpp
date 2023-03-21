@@ -5,25 +5,19 @@
 #define HITBOX_Y 16
 
 enum GhostAnims {
-    MOVE_UP, MOVE_DOWN,MOVE_LEFT,MOVE_RIGHT
+    MOVE_LEFT,MOVE_RIGHT
 };
 
 void Ghost::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
     spritesheet.loadFromFile("images/ghost.png", TEXTURE_PIXEL_FORMAT_RGBA);
-    sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0 / 4.0, 1.0 / 2.0), &spritesheet, &shaderProgram);
+    sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0f / 4.0f, 1.0f / 5.0f), &spritesheet, &shaderProgram);
     sprite->setNumberAnimations(2);
 
-    sprite->setAnimationSpeed(MOVE_DOWN, 8);
-    sprite->addKeyframe(MOVE_DOWN, glm::vec2(0.f, 0.0 / 2.0));
-    sprite->addKeyframe(MOVE_DOWN, glm::vec2(0.f, 1.0 / 2.0));
-    sprite->addKeyframe(MOVE_DOWN, glm::vec2(1.0 / 4.0, 0.0 / 2.0));
-    sprite->addKeyframe(MOVE_DOWN, glm::vec2(1.0 / 4.0, 1.0 / 2.0));
+    sprite->setAnimationSpeed(MOVE_RIGHT, 8);
+    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.f, 0.0f / 5.0f));
 
-    sprite->setAnimationSpeed(MOVE_UP, 8);
-    sprite->addKeyframe(MOVE_UP, glm::vec2(2.0 / 4.0, 0.0 / 2.0));
-    sprite->addKeyframe(MOVE_UP, glm::vec2(2.0 / 4.0, 1.0 / 2.0));
-    sprite->addKeyframe(MOVE_UP, glm::vec2(3.0 / 4.0, 0.0 / 2.0));
-    sprite->addKeyframe(MOVE_UP, glm::vec2(3.0 / 4.0, 1.0 / 2.0));
+    sprite->setAnimationSpeed(MOVE_LEFT, 8);
+    sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.0f / 4.0f, 1.0f / 5.0f));
 
     sprite->changeAnimation(0);
     tileMapDispl = tileMapPos;
@@ -33,48 +27,34 @@ void Ghost::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 void Ghost::update(int deltaTime) {
     sprite->update(deltaTime);
 
-    if (goLeft) {
-        if (!map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32))) {
-            if (sprite->animation() != MOVE_LEFT) sprite->changeAnimation(MOVE_LEFT);
-            posEnemy.x -= 1;
-        }
-        else goLeft = !goLeft;
-    }
     if (goUp) {
-        if (!map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32))) {
-            if (sprite->animation() != MOVE_UP) sprite->changeAnimation(MOVE_UP);
+        if (!map->collisionMoveDown(posEnemy, glm::ivec2(32, 32), &posEnemy.y, false)) {
+            posEnemy.y += 1;
+        }
+        else goUp = !goUp;
+    }
+    else {
+        if (!map->collisionMoveUp(posEnemy, glm::ivec2(32, 32), &posEnemy.y, false)) {
             posEnemy.y -= 1;
         }
         else goUp = !goUp;
     }
 
-    glm::ivec2 posNextx;
-    glm::ivec2 posNexty;
-    if (goLeft) posNextx = posEnemy + glm::ivec2(-24, 0);
-    else posNextx = posEnemy + glm::ivec2(24, 0);
-    if (goUp) posNexty = posEnemy + glm::ivec2(0, -24);
-    else posNexty = posEnemy + glm::ivec2(0, 24);
-
-    if (!map->collisionMoveDown(posNextx, glm::ivec2(32, 32), &posEnemy.y))
-    {
-        if (goLeft) {
-            posEnemy.x += 0;
+    if (goLeft) {
+        if (!map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32), false)) {
+            if (sprite->animation() != MOVE_LEFT) sprite->changeAnimation(MOVE_LEFT);
+            posEnemy.x -= 1;
         }
-        else {
-            posEnemy.x -= 0;
-        }
-        goLeft = !goLeft;
+        else goLeft = !goLeft;
     }
-    if (!map->collisionMoveDown(posNexty, glm::ivec2(32, 32), &posEnemy.y))
-    {
-        if (goUp) {
-            posEnemy.y += 0;
+    else {
+        if (!map->collisionMoveRight(posEnemy, glm::ivec2(32, 32), false)) {
+            if (sprite->animation() != MOVE_RIGHT) sprite->changeAnimation(MOVE_RIGHT);
+            posEnemy.x += 1;
         }
-        else {
-            posEnemy.y -= 0;
-        }
-        goUp = !goUp;
+        else goLeft = !goLeft;
     }
+    
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
 

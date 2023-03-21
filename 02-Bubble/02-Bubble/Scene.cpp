@@ -60,7 +60,7 @@ void Scene::init()
 	initShaders();
 	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
-	enemy = new Skeleton();
+	enemy = new Ghost();
 	enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	enemy->setPosition(glm::vec2(INIT_ENEMY_X_TILES * map->getTileSize(), INIT_ENEMY_Y_TILES * map->getTileSize()));
 	enemy->setTileMap(map);

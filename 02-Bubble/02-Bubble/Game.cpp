@@ -8,7 +8,8 @@ void Game::init()
 	bPlay = true;
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
 	menu.init();
-	currentScene = SceneType::MENU_SCENE;
+	scene.init();
+	currentScene = SceneType::SCENE_1;
 }
 
 bool Game::update(int deltaTime)
@@ -80,7 +81,7 @@ void Game::mouseRelease(int button)
 
 bool Game::getKey(int key) 
 {
-
+	/*
 	if (key == 32) { //tecla ENTER
 		int cursor = menu.getCursor();
 		switch (cursor) {
@@ -98,12 +99,14 @@ bool Game::getKey(int key)
 			break;
 		}
 	}
+	*/
 
 	return keys[key];
 }
 
 bool Game::getSpecialKey(int key)
 {
+	/*
 	if (currentScene == MENU_SCENE) {
 		int cursor = menu.getCursor();
 		if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
@@ -118,7 +121,7 @@ bool Game::getSpecialKey(int key)
 		cursor = cursor % 4;
 		menu.setCursor(cursor);
 	}
-
+	*/
 	return specialKeys[key];
 }
 

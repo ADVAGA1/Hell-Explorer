@@ -15,6 +15,7 @@
     <ClInclude Include="Door.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Coin.h" />
+    <ClInclude Include="Ghost.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Key.h" />
     <ClInclude Include="Lava.h" />
@@ -35,6 +36,7 @@
     <ClCompile Include="Enemy.h" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Coin.cpp" />
+    <ClCompile Include="Ghost.cpp" />
     <ClCompile Include="Key.cpp" />
     <ClCompile Include="Lava.cpp" />
     <ClCompile Include="main.cpp" />
