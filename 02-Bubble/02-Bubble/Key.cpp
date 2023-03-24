@@ -1,8 +1,8 @@
 #include "Key.h"
 
 
-#define HITBOX_X 8
-#define HITBOX_Y 8
+#define HITBOX_X 16
+#define HITBOX_Y 16
 
 void Key::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 	spritesheet.loadFromFile("images/key.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -24,5 +24,5 @@ glm::ivec2 Key::getBoundingBoxMax() {
 }
 
 glm::ivec2 Key::getBoundingBoxMin() {
-	return posItem + glm::ivec2(-HITBOX_X, -HITBOX_Y);
+	return posItem;
 }

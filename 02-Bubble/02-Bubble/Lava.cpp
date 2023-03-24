@@ -1,7 +1,7 @@
 #include "Lava.h"
 
-#define HITBOX_X 8
-#define HITBOX_Y 17
+#define HITBOX_X 16
+#define HITBOX_Y 16
 
 void Lava::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 
@@ -27,5 +27,5 @@ glm::ivec2 Lava::getBoundingBoxMax() {
 	return posEnemy + glm::ivec2(HITBOX_X, HITBOX_Y);
 }
 glm::ivec2 Lava::getBoundingBoxMin() {
-	return posEnemy + glm::ivec2(-HITBOX_X, -HITBOX_Y);
+	return posEnemy + glm::ivec2(0,-2); //offset para que pille colision
 }

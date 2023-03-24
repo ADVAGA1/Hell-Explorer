@@ -1,8 +1,8 @@
 #include "Skeleton.h"
 
 #define FALL_STEP 4
-#define HITBOX_X 8
-#define HITBOX_Y 16
+#define HITBOX_X 22
+#define HITBOX_Y 32
 
 enum EnemyAnims {
 	MOVE_LEFT, MOVE_RIGHT
@@ -45,14 +45,14 @@ void Skeleton::update(int deltaTime)
 	sprite->update(deltaTime);
 
 	if (goLeft) {
-		if (!map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32),false)) {
+		if (!map->collisionMoveLeft(posEnemy, glm::ivec2(24, 32),false)) {
 			if (sprite->animation() != MOVE_LEFT) sprite->changeAnimation(MOVE_LEFT);
 			posEnemy.x -= 1;
 		}
 		else goLeft = !goLeft;
 	}
 	else {
-		if (!map->collisionMoveRight(posEnemy, glm::ivec2(32, 32),false)) {
+		if (!map->collisionMoveRight(posEnemy, glm::ivec2(24, 32),false)) {
 			if (sprite->animation() != MOVE_RIGHT) sprite->changeAnimation(MOVE_RIGHT);
 			posEnemy.x += 1;
 		}
@@ -62,8 +62,8 @@ void Skeleton::update(int deltaTime)
 	posEnemy.y += FALL_STEP;
 
 	glm::ivec2 posNext;
-	if (goLeft) posNext = posEnemy + glm::ivec2(-20, 0);
-	else posNext = posEnemy + glm::ivec2(32, 0);
+	if (goLeft) posNext = posEnemy + glm::ivec2(-HITBOX_X, 0);
+	else posNext = posEnemy + glm::ivec2(HITBOX_X, 0);
 
 	if (!map->collisionMoveDown(posNext, glm::ivec2(32, 32), &posEnemy.y, false))
 	{
@@ -85,5 +85,5 @@ glm::ivec2 Skeleton::getBoundingBoxMax() {
 	return posEnemy + glm::ivec2(HITBOX_X, HITBOX_Y);
 }
 glm::ivec2 Skeleton::getBoundingBoxMin() {
-	return posEnemy + glm::ivec2(-HITBOX_X, -HITBOX_Y);
+	return posEnemy;
 }

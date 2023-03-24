@@ -10,8 +10,8 @@
 #define JUMP_HEIGHT 80
 #define FALL_STEP 4
 
-#define HITBOX_X 16
-#define HITBOX_Y 16
+#define HITBOX_X 32
+#define HITBOX_Y 32
 
 
 enum PlayerAnims
@@ -148,8 +148,9 @@ void Player::update(int deltaTime)
 			}
 		}
 	}
-	
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+
+	cout << posPlayer.x << " " << posPlayer.y << endl;
 }
 
 void Player::render()
@@ -177,7 +178,7 @@ glm::ivec2 Player::getBoundingBoxMax() {
 }
 
 glm::ivec2 Player::getBoundingBoxMin() {
-	return posPlayer + glm::ivec2(-HITBOX_X, -HITBOX_Y);
+	return posPlayer + glm::ivec2(0, 0);
 }
 
 int Player::getLives() {

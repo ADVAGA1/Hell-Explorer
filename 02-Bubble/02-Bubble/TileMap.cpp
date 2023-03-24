@@ -259,6 +259,25 @@ vector<pair<int,int>>& TileMap::getLavaMap() {
 	return lavaMap;
 }
 
+int TileMap::getCollisionBlock(const glm::ivec2& pos, const glm::ivec2& size) {
+	int x0, x1, y;
+	vector<int> tiles;
+
+	x0 = pos.x / tileSize;
+	x1 = (pos.x + size.x - 1) / tileSize;
+	y = (pos.y + size.y - 1) / tileSize;
+	for (int x = x0; x <= x1; x++)
+	{
+		int tile = map[y * mapSize.x + x];
+		if (tile != 0)
+		{
+			tiles.push_back(tile);
+		}
+	}
+	return 0;
+	
+}
+
 
 
 

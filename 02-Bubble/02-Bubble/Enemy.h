@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "TileMap.h"
 
+#define OFFSET 16
 
 class Enemy
 {

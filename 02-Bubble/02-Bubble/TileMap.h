@@ -37,6 +37,7 @@ public:
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool player);
 	bool collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, bool jumping);
 
+	int getCollisionBlock(const glm::ivec2& pos, const glm::ivec2& size);
 
 	std::map<pair<int, int>, bool>& getFloor();
 	vector<pair<int, int>>& getLavaMap();

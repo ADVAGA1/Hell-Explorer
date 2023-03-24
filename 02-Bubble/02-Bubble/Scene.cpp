@@ -6,14 +6,14 @@
 #include "Scene.h"
 
 
-#define SCREEN_X 64
-#define SCREEN_Y 64
+#define SCREEN_X 32
+#define SCREEN_Y 32
 
 #define INIT_PLAYER_X_TILES 4
 #define INIT_PLAYER_Y_TILES 24
 
 #define INIT_ENEMY_X_TILES 22
-#define INIT_ENEMY_Y_TILES 24
+#define INIT_ENEMY_Y_TILES 12
 
 #define INIT_COIN_X_TILES 12
 #define INIT_COIN_Y_TILES 24
@@ -67,7 +67,7 @@ void Scene::init()
 	initShaders();
 	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
-	enemy = new Ghost();
+	enemy = new Vampire();
 	enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	enemy->setPosition(glm::vec2(INIT_ENEMY_X_TILES * map->getTileSize(), INIT_ENEMY_Y_TILES * map->getTileSize()));
 	enemy->setTileMap(map);
@@ -91,7 +91,7 @@ void Scene::init()
 	coin->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	coin->setPosition(glm::vec2(INIT_COIN_X_TILES * map->getTileSize(), INIT_COIN_Y_TILES * map->getTileSize()));
 	coin->setTileMap(map);
-
+	
 	key = new Key();
 	key->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	key->setTileMap(map);
@@ -102,7 +102,7 @@ void Scene::init()
 	door->setTileMap(map);
 
 	heartTexture.loadFromFile("images/heart.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	heart = Sprite::createSprite(glm::vec2(32, 32), glm::vec2(1, 1), &heartTexture, &texProgram);
+	heart = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(1, 1), &heartTexture, &texProgram);
 	heart->setNumberAnimations(1);
 	heart->setAnimationSpeed(0, 8);
 	heart->addKeyframe(0, glm::vec2(0, 0));
@@ -218,7 +218,7 @@ void Scene::render()
 	background->render();
 
 	for (int i = 0; i < player->getLives(); ++i) {
-		heart->setPosition(glm::ivec2(16+32*i,4));
+		heart->setPosition(glm::ivec2(16+20*i,8));
 		heart->render();
 	}
 

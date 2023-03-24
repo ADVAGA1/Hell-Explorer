@@ -1,7 +1,7 @@
 #include "Coin.h"
 
-#define HITBOX_X 8
-#define HITBOX_Y 8
+#define HITBOX_X 16
+#define HITBOX_Y 16
 
 void Coin::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 	spritesheet.loadFromFile("images/coin.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -36,5 +36,5 @@ glm::ivec2 Coin::getBoundingBoxMax() {
 }
 
 glm::ivec2 Coin::getBoundingBoxMin() {
-	return posItem + glm::ivec2(-HITBOX_X, -HITBOX_Y);
+	return posItem;
 }

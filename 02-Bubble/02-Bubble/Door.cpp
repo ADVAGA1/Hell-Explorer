@@ -1,8 +1,9 @@
 #include "Door.h"
 
-#define HITBOX_X 8
-#define HITBOX_Y 32
-#define OFFSET 32
+#define HITBOX_X 32
+#define HITBOX_Y 57
+#define OFFSET_X 34
+#define OFFSET_Y 7
 
 enum DoorAnims
 {
@@ -30,11 +31,11 @@ void Door::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 
 
 glm::ivec2 Door::getBoundingBoxMax() {
-	return posItem + glm::ivec2(OFFSET, 0) + glm::ivec2(HITBOX_X, HITBOX_Y);
+	return posItem + glm::ivec2(OFFSET_X, OFFSET_Y) + glm::ivec2(HITBOX_X, HITBOX_Y);
 }
 
 glm::ivec2 Door::getBoundingBoxMin() {
-	return posItem + glm::ivec2(OFFSET, 0) + glm::ivec2(-HITBOX_X, -HITBOX_Y);
+	return posItem + glm::ivec2(OFFSET_X, OFFSET_Y);
 }
 
 void Door::openDoor() {

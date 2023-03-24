@@ -7,7 +7,7 @@ void Game::init()
 {
 	bPlay = true;
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
-	menu.init();
+	//menu.init();
 	scene.init();
 	currentScene = SceneType::SCENE_1;
 }

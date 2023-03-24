@@ -15,6 +15,7 @@
 #include "Door.h"
 #include "Lava.h"
 #include "Ghost.h"
+#include "Vampire.h"
 
 
 // Scene contains all the entities of our game.
@@ -42,7 +43,7 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	Ghost* enemy;
+	Enemy* enemy;
 	Texture spritesheet;
 	Texture backgroundTexture;
 	Sprite* background;

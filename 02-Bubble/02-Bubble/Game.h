@@ -6,8 +6,8 @@
 #include "Menu.h"
 
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 
 enum class SceneType {
 	MENU, INSTRUCTIONS, CREDITS, SCENE_1
