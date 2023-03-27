@@ -14,12 +14,17 @@ void Menu::init() {
 	backgroundTex.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	background = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &backgroundTex, &texProgram);
 
-	cursorTexture.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	cursorSprite = Sprite::createSprite(glm::vec2(32, 32), glm::vec2(0.25f,0.25f), &cursorTexture, &texProgram);
+	cursorTexture.loadFromFile("images/cursor.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	cursorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.25f,1.f), &cursorTexture, &texProgram);
 	cursorSprite->setNumberAnimations(1);
-	cursorSprite->setAnimationSpeed(0, 0);
+	cursorSprite->setAnimationSpeed(0, 4);
 	cursorSprite->addKeyframe(0, glm::vec2(0.f, 0.f));
-	cursorSprite->setPosition(glm::vec2(260,220));
+	cursorSprite->addKeyframe(0, glm::vec2(0.25f, 0.f));
+	cursorSprite->addKeyframe(0, glm::vec2(0.50f, 0.f));
+	cursorSprite->addKeyframe(0, glm::vec2(0.75f, 0.f));
+	cursorSprite->changeAnimation(0);
+
+	cursorSprite->setPosition(glm::ivec2(90,198));
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	cursor = CursorType::PLAY;
@@ -34,13 +39,13 @@ void Menu::update(int deltaTime) {
 	switch (cursor)
 	{
 	case CursorType::PLAY:
-		cursorSprite->setPosition(glm::vec2(240, 190));
+		cursorSprite->setPosition(glm::vec2(90, 198));
 		break;
 	case CursorType::INSTRUCTIONS:
-		cursorSprite->setPosition(glm::vec2(485, 270));
+		cursorSprite->setPosition(glm::vec2(90, 265));
 		break;
 	case CursorType::CREDITS:
-		cursorSprite->setPosition(glm::vec2(370, 345));
+		cursorSprite->setPosition(glm::vec2(90, 345));
 		break;
 	default:
 		break;
