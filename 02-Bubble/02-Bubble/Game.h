@@ -10,7 +10,7 @@
 #define SCREEN_HEIGHT 480
 
 enum class SceneType {
-	MENU, INSTRUCTIONS, CREDITS, SCENE_1
+	MENU, INSTRUCTIONS, CREDITS, LEVEL1, LEVEL2, LEVEL3
 };
 
 
@@ -51,11 +51,12 @@ public:
 
 private:
 	bool bPlay;                       // Continue to play game?
-	Scene scene;                      // Scene to render
+	Scene* scene;                      // Scene to render
 	bool keys[256], specialKeys[256]; // Store key states so that 
 	                                  // we can have access at any time
 	SceneType currentScene;
-	Menu menu;
+	Menu* menu;
+	int globalScore;
 
 };
 

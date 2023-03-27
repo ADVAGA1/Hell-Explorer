@@ -207,7 +207,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	{
 		if(map[y*mapSize.x+x] != 0)
 		{
-			if(*posY - tileSize * y + size.y <= 4)
+			if(pos.y - tileSize * y + size.y <= 4)
 			{
 				*posY = tileSize * y - size.y;
 
@@ -278,7 +278,9 @@ int TileMap::getCollisionBlock(const glm::ivec2& pos, const glm::ivec2& size) {
 	
 }
 
-
+int TileMap::checkTile(int x, int y) {
+	return map[y * mapSize.x + x];
+}
 
 
 

@@ -5,6 +5,9 @@
 class Ghost : public Enemy
 {
 public:
+
+	Ghost(bool left);
+
 	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override;
 	void update(int deltaTime) override;
 
@@ -12,8 +15,7 @@ public:
 	glm::ivec2 getBoundingBoxMin() override;
 
 private:
-	bool goLeft = true;
+	bool goLeft;
 	bool goUp = true;
-	bool hasMoved;
 };
 

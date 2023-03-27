@@ -14,7 +14,7 @@ public:
 	void render();
 
 	void setTileMap(TileMap* tileMap);
-	void setPosition(const glm::vec2& pos);
+	virtual void setPosition(const glm::vec2& pos);
 
 	glm::ivec2 getPosition();
 

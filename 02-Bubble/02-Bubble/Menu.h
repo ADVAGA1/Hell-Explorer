@@ -5,7 +5,7 @@
 #include "Sprite.h"
 
 enum CursorType {
-	PLAY, INSTRUCTIONS, CREDITS, EXIT
+	PLAY, INSTRUCTIONS, CREDITS
 };
 
 

@@ -3,14 +3,18 @@
 
 #define SLIME_HITBOX_X 24
 #define SLIME_HITBOX_Y 24
-#define BAT_HITBOX_X 31
-#define BAT_HITBOX_Y 26
-#define TIME 2  //en segundos
+#define BAT_HITBOX_X 16
+#define BAT_HITBOX_Y 16
+#define TIME 5  //en segundos
 #define LAVA 20
 
 enum VampireAnims {
     MOVE_LEFT, MOVE_RIGHT, FLY_RIGHT, FLY_LEFT
 };
+
+Vampire::Vampire(bool left) {
+    goLeft = left;
+}
 
 void Vampire::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
     spritesheet.loadFromFile("images/vampire.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -47,7 +51,6 @@ void Vampire::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
     isBat = false;
-    goLeft = true;
     goUp = true;
     isLanding = false;
     timer = TIME * 1000;
@@ -68,9 +71,23 @@ void Vampire::update(int deltaTime) {
         }
     }
 
+    glm::ivec2 posNext;
+    
+
     if (!isBat) {
+
+        if (goLeft) posNext = posEnemy + glm::ivec2(0, SLIME_HITBOX_Y);
+        else posNext = posEnemy + glm::ivec2(SLIME_HITBOX_X, SLIME_HITBOX_Y);
+
+        int nextTile = map->checkTile(posNext.x / map->getTileSize(), posNext.y / map->getTileSize());
+
+        if (!map->collidable(nextTile,false))
+        {
+            goLeft = !goLeft;
+        }
+        
         if (goLeft) {
-            if (!map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32), false)) {
+            if (!map->collisionMoveLeft(posEnemy, glm::ivec2(SLIME_HITBOX_X, SLIME_HITBOX_Y), false)) {
                 if (sprite->animation() != MOVE_LEFT) sprite->changeAnimation(MOVE_LEFT);
                 posEnemy.x -= 1;
             }
@@ -80,7 +97,7 @@ void Vampire::update(int deltaTime) {
             }
         }
         else {
-            if (!map->collisionMoveRight(posEnemy, glm::ivec2(32, 32), false)) {
+            if (!map->collisionMoveRight(posEnemy, glm::ivec2(SLIME_HITBOX_X, SLIME_HITBOX_Y), false)) {
                 if (sprite->animation() != MOVE_RIGHT) sprite->changeAnimation(MOVE_RIGHT);
                 posEnemy.x += 1;
             }
@@ -90,72 +107,90 @@ void Vampire::update(int deltaTime) {
             }
         }
 
-        posEnemy.y += 4;
-
-        glm::ivec2 posNext;
-        if (goLeft) posNext = posEnemy + glm::ivec2(-SLIME_HITBOX_X, 0);
-        else posNext = posEnemy + glm::ivec2(SLIME_HITBOX_X, 0);
-
-        if (!map->collisionMoveDown(posNext, glm::ivec2(32, 32), &posEnemy.y, false))
-        {
-            posEnemy.y = startY;
-            if (goLeft) {
-                posEnemy.x += 2;
-            }
-            else {
-                posEnemy.x -= 2;
-            }
-            goLeft = !goLeft;
-        }
-
     }
     else {
+        
+        if (isLanding)
+        {
+            posNext = posEnemy + glm::ivec2(BAT_HITBOX_X/2, BAT_HITBOX_Y);
+            int nextTile = map->checkTile(posNext.x / map->getTileSize(), posNext.y / map->getTileSize());
 
-        if (goUp) {
-            if (!map->collisionMoveDown(posEnemy, glm::ivec2(BAT_HITBOX_X, 32 + 1), &posEnemy.y, false)) {
-                posEnemy.y += 1;
+            if (nextTile == 2) {
+                isLanding = false;
+                isBat = false;
+                posEnemy.y -= SLIME_HITBOX_Y - BAT_HITBOX_Y;
+                timer = TIME * 1000;
             }
             else {
-                goUp = !goUp;
-                startY = posEnemy.y;
-                int bloque = map->getCollisionBlock(posEnemy, glm::ivec2(32, 32));
-                if (isLanding && bloque != LAVA)
-                {
-                    isLanding = !isLanding;
-                    isBat = !isBat;
-                    timer = TIME * 1000;
+                if (goLeft) {
+                    if (!map->collisionMoveLeft(posEnemy, glm::ivec2(BAT_HITBOX_X+1, BAT_HITBOX_Y), false)) {
+                        if (sprite->animation() != FLY_LEFT) sprite->changeAnimation(FLY_LEFT);
+                        posEnemy.x -= 1;
+                    }
+                    else {
+                        goLeft = !goLeft;
+                        posEnemy.x += 1;
+                    }
+                }
+                else {
+                    if (!map->collisionMoveRight(posEnemy, glm::ivec2(BAT_HITBOX_X+1, BAT_HITBOX_Y), false)) {
+                        if (sprite->animation() != FLY_RIGHT) sprite->changeAnimation(FLY_RIGHT);
+                        posEnemy.x += 1;
+                    }
+                    else {
+                        goLeft = !goLeft;
+                        posEnemy.x -= 1;
+                    }
+                }
+
+                if (nextTile == LAVA) goUp = true;
+
+                if (map->collisionMoveUp(glm::ivec2(posEnemy.x,posEnemy.y-1), glm::ivec2(BAT_HITBOX_X, BAT_HITBOX_Y), false)) goUp = false;
+
+                if (goUp) posEnemy.y -= 1;
+                else posEnemy.y += 1;
+
+            }
+
+        }
+        else {
+            if (!goUp) {
+                if (!map->collisionMoveDown(posEnemy, glm::ivec2(BAT_HITBOX_X, BAT_HITBOX_Y + 1), &posEnemy.y, false)) {
+                    posEnemy.y += 1;
+                }
+                else goUp = !goUp;
+            }
+            else {
+                if (!map->collisionMoveUp(posEnemy, glm::ivec2(BAT_HITBOX_X, BAT_HITBOX_Y), false)) {
+                    posEnemy.y -= 1;
+                }
+                else {
+                    goUp = !goUp;
+                }
+            }
+
+            if (goLeft) {
+                if (!map->collisionMoveLeft(posEnemy, glm::ivec2(BAT_HITBOX_X+1, BAT_HITBOX_Y), false)) {
+                    if (sprite->animation() != FLY_LEFT) sprite->changeAnimation(FLY_LEFT);
+                    posEnemy.x -= 1;
+                }
+                else {
+                    goLeft = !goLeft;
+                    posEnemy.x += 1;
+                }
+            }
+            else {
+                if (!map->collisionMoveRight(posEnemy, glm::ivec2(BAT_HITBOX_X + 1, BAT_HITBOX_Y), false)) {
+                    if (sprite->animation() != FLY_RIGHT) sprite->changeAnimation(FLY_RIGHT);
+                    posEnemy.x += 1;
+                }
+                else {
+                    goLeft = !goLeft;
+                    posEnemy.x -= 1;
                 }
             }
         }
-        else {
-            if (!map->collisionMoveUp(posEnemy, glm::ivec2(32, 32), false)) {
-                posEnemy.y -= 1;
-            }
-            else {
-                goUp = !goUp;
-            }
-        }
 
-        if (goLeft) {
-            if (!map->collisionMoveLeft(posEnemy, glm::ivec2(32+1, 32), false)) {
-                if (sprite->animation() != FLY_LEFT) sprite->changeAnimation(FLY_LEFT);
-                posEnemy.x -= 1;
-            }
-            else {
-                goLeft = !goLeft;
-                posEnemy.x += 1;
-            }
-        }
-        else {
-            if (!map->collisionMoveRight(posEnemy, glm::ivec2(32+1, 32), false)) {
-                if (sprite->animation() != FLY_RIGHT) sprite->changeAnimation(FLY_RIGHT);
-                posEnemy.x += 1;
-            }
-            else {
-                goLeft = !goLeft;
-                posEnemy.x -= 1;
-            }
-        }
     }
 
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
@@ -168,4 +203,12 @@ glm::ivec2 Vampire::getBoundingBoxMax() {
 }
 glm::ivec2 Vampire::getBoundingBoxMin() {
     return posEnemy;
+}
+
+void Vampire::setPosition(const glm::vec2& pos)
+{
+    posEnemy = pos;
+    posEnemy += glm::ivec2(0, 32 - SLIME_HITBOX_Y);
+    startY = int(posEnemy.y);
+    sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }

@@ -16,7 +16,7 @@
 
 enum PlayerAnims
 {
-	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, JUMPING_UP_R, JUMPING_DOWN_R, JUMPING_UP_L, JUMPING_DOWN_L
+	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, JUMPING_UP_R, JUMPING_DOWN_R, JUMPING_UP_L, JUMPING_DOWN_L, DAMAGED_RIGHT, DAMAGED_LEFT, DAMAGED_MOVE_RIGHT, DAMAGED_MOVE_LEFT
 };
 
 
@@ -25,9 +25,10 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	lives = 5;
 	bJumping = false;
 	godMode = false;
+	invulnerable = false;
 	spritesheet.loadFromFile("images/player.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0/8.0, 0.20), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(8);
+	sprite->setNumberAnimations(12);
 	
 		sprite->setAnimationSpeed(STAND_LEFT, 6);
 		sprite->addKeyframe(STAND_LEFT, glm::vec2(0.f, 0.2f));
@@ -72,6 +73,46 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 
 		sprite->setAnimationSpeed(JUMPING_DOWN_L, 6);
 		sprite->addKeyframe(JUMPING_DOWN_R, glm::vec2(7.0f / 8.0f, 0.2f));
+
+		sprite->setAnimationSpeed(DAMAGED_RIGHT, 10);
+		sprite->addKeyframe(DAMAGED_RIGHT, glm::vec2(0.f, 0.f));
+		sprite->addKeyframe(DAMAGED_RIGHT, glm::vec2(1.0f / 8.0f, 0.f));
+		sprite->addKeyframe(DAMAGED_RIGHT, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(DAMAGED_RIGHT, glm::vec2(2.0f / 8.0f, 0.f));
+		sprite->addKeyframe(DAMAGED_RIGHT, glm::vec2(3.0f / 8.0f, 0.f));
+		sprite->addKeyframe(DAMAGED_RIGHT, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(DAMAGED_RIGHT, glm::vec2(4.0f / 8.0f, 0.f));
+		sprite->addKeyframe(DAMAGED_RIGHT, glm::vec2(5.0f / 8.0f, 0.f));
+
+		sprite->setAnimationSpeed(DAMAGED_LEFT, 10);
+		sprite->addKeyframe(DAMAGED_LEFT, glm::vec2(0.f, 0.2f));
+		sprite->addKeyframe(DAMAGED_LEFT, glm::vec2(1.0f / 8.0f, 0.2f));
+		sprite->addKeyframe(DAMAGED_LEFT, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(DAMAGED_LEFT, glm::vec2(2.0f / 8.0f, 0.2f));
+		sprite->addKeyframe(DAMAGED_LEFT, glm::vec2(3.0f / 8.0f, 0.2f));
+		sprite->addKeyframe(DAMAGED_LEFT, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(DAMAGED_LEFT, glm::vec2(4.0f / 8.0f, 0.2f));
+		sprite->addKeyframe(DAMAGED_LEFT, glm::vec2(5.0f / 8.0f, 0.2f));
+
+		sprite->setAnimationSpeed(DAMAGED_MOVE_RIGHT, 10);
+		sprite->addKeyframe(DAMAGED_MOVE_RIGHT, glm::vec2(0.f, 0.4f));
+		sprite->addKeyframe(DAMAGED_MOVE_RIGHT, glm::vec2(1.0f / 8.0f, 0.4f));
+		sprite->addKeyframe(DAMAGED_MOVE_RIGHT, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(DAMAGED_MOVE_RIGHT, glm::vec2(2.0f / 8.0f, 0.4f));
+		sprite->addKeyframe(DAMAGED_MOVE_RIGHT, glm::vec2(3.0f / 8.0f, 0.4f));
+		sprite->addKeyframe(DAMAGED_MOVE_RIGHT, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(DAMAGED_MOVE_RIGHT, glm::vec2(4.0f / 8.0f, 0.4f));
+		sprite->addKeyframe(DAMAGED_MOVE_RIGHT, glm::vec2(5.0f / 8.0f, 0.4f));
+
+		sprite->setAnimationSpeed(DAMAGED_MOVE_LEFT, 10);
+		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(0.f, 0.6f));
+		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(1.0f / 8.0f, 0.6f));
+		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(2.0f / 8.0f, 0.6f));
+		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(3.0f / 8.0f, 0.6f));
+		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(4.0f / 8.0f, 0.6f));
+		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(5.0f / 8.0f, 0.6f));
 		
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
@@ -85,37 +126,58 @@ void Player::update(int deltaTime)
 
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
-		if(sprite->animation() != MOVE_LEFT)
-			sprite->changeAnimation(MOVE_LEFT);
+		
+		goLeft = true;
+		if (invulnerable) {
+			if (sprite->animation() != DAMAGED_MOVE_LEFT) sprite->changeAnimation(DAMAGED_MOVE_LEFT);
+		}
+		else {
+			if (sprite->animation() != MOVE_LEFT) sprite->changeAnimation(MOVE_LEFT);
+		}
+
 		posPlayer.x -= 2;
-		if(map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32),bJumping))
+		if(map->collisionMoveLeft(posPlayer, glm::ivec2(HITBOX_X, HITBOX_Y),bJumping))
 		{
 			posPlayer.x += 2;
-			sprite->changeAnimation(STAND_LEFT);
+			
+			if (invulnerable) sprite->changeAnimation(DAMAGED_LEFT);
+			else sprite->changeAnimation(STAND_LEFT);
 		}
 	}
 	else if(Game::instance().getSpecialKey(GLUT_KEY_RIGHT))
 	{
-		if(sprite->animation() != MOVE_RIGHT)
-			sprite->changeAnimation(MOVE_RIGHT);
+		
+		goLeft = false;
+		if (invulnerable) {
+			if (sprite->animation() != DAMAGED_MOVE_RIGHT) sprite->changeAnimation(DAMAGED_MOVE_RIGHT);
+		}
+		else {
+			if (sprite->animation() != MOVE_RIGHT) sprite->changeAnimation(MOVE_RIGHT);
+		}
 		posPlayer.x += 2;
-		if(map->collisionMoveRight(posPlayer, glm::ivec2(32, 32),bJumping))
+		if(map->collisionMoveRight(posPlayer, glm::ivec2(HITBOX_X, HITBOX_Y),bJumping))
 		{
 			posPlayer.x -= 2;
-			sprite->changeAnimation(STAND_RIGHT);
+			
+			if (invulnerable) sprite->changeAnimation(DAMAGED_RIGHT);
+			else sprite->changeAnimation(STAND_RIGHT);
 		}
 	}
 	else
 	{
-		if(sprite->animation() == MOVE_LEFT)
-			sprite->changeAnimation(STAND_LEFT);
-		else if(sprite->animation() == MOVE_RIGHT)
-			sprite->changeAnimation(STAND_RIGHT);
+		if (sprite->animation() == MOVE_LEFT) sprite->changeAnimation(STAND_LEFT);
+		else if (sprite->animation() == MOVE_RIGHT) sprite->changeAnimation(STAND_RIGHT);
+		
+		if(invulnerable){
+			if (sprite->animation() == DAMAGED_MOVE_LEFT) sprite->changeAnimation(DAMAGED_LEFT);
+			else if (sprite->animation() == DAMAGED_MOVE_RIGHT) sprite->changeAnimation(DAMAGED_RIGHT);
+		}
+		
 	}
 	
 	if(bJumping)
 	{
-		if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32),bJumping)) {
+		if (map->collisionMoveUp(posPlayer, glm::ivec2(HITBOX_X, HITBOX_Y),bJumping)) {
 			bJumping = false;
 			posPlayer.y = startY;
 		}
@@ -124,13 +186,13 @@ void Player::update(int deltaTime)
 		if(jumpAngle == 180)
 		{
 			bJumping = false;
-			posPlayer.y = startY;
+			//posPlayer.y = startY;
 		}
 		else
 		{
 			posPlayer.y = int(startY - JUMP_HEIGHT * sin(3.14159f * jumpAngle / 180.f));
 			if (jumpAngle > 90) {
-				bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y, true);
+				bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(HITBOX_X, HITBOX_Y), &posPlayer.y, true);
 			}
 		}
 
@@ -138,7 +200,7 @@ void Player::update(int deltaTime)
 	else
 	{
 		posPlayer.y += FALL_STEP;
-		if(map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y, true))
+		if(map->collisionMoveDown(posPlayer, glm::ivec2(HITBOX_X, HITBOX_Y), &posPlayer.y, true))
 		{
 			if(Game::instance().getSpecialKey(GLUT_KEY_UP))
 			{
@@ -150,7 +212,6 @@ void Player::update(int deltaTime)
 	}
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 
-	cout << posPlayer.x << " " << posPlayer.y << endl;
 }
 
 void Player::render()
@@ -193,6 +254,20 @@ bool Player::isGodMode() {
 	return godMode;
 }
 
+void Player::changeInvulnerable(bool inv) {
+	this->invulnerable = inv;
+	if (inv == false) {
+		if (goLeft) sprite->changeAnimation(STAND_LEFT);
+		else sprite->changeAnimation(STAND_RIGHT);
+	}
+	else {
+		if (goLeft) sprite->changeAnimation(DAMAGED_LEFT);
+		else sprite->changeAnimation(DAMAGED_RIGHT);
+	}
+}
 
+void Player::setGodMode(bool b) {
+	godMode = b;
+}
 
 

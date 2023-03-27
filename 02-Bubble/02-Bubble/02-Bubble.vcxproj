@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
+    <ClInclude Include="Chrono.h" />
+    <ClInclude Include="Clock.h" />
     <ClInclude Include="Door.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Coin.h" />
@@ -27,14 +29,20 @@
     <ClInclude Include="Skeleton.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="StaticSprite.h" />
+    <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TexturedQuad.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="Vampire.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Chrono.cpp" />
+    <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Door.cpp" />
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="Enemy.h" />
+    <ClCompile Include="Enemy.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="Ghost.cpp" />
@@ -50,7 +58,9 @@
     <ClCompile Include="Skeleton.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="StaticSprite.cpp" />
+    <ClCompile Include="Text.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TexturedQuad.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="Vampire.cpp" />
   </ItemGroup>
@@ -96,13 +106,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\libs\Simple OpenGL Image Library\src;..\..\..\libs\freeglut\include;..\..\..\libs\glew-1.13.0\include;..\..\..\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\libs\freetype-2.3.5-1-bin\include\freetype2;..\..\..\libs\freetype-2.3.5-1-bin\include;..\..\..\libs\Simple OpenGL Image Library\src;..\..\..\libs\freeglut\include;..\..\..\libs\glew-1.13.0\include;..\..\..\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\libs\Simple OpenGL Image Library\projects\VC9\Debug;..\..\..\libs\freeglut\lib;..\..\..\libs\glew-1.13.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SOIL.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\libs\freetype-2.3.5-1-bin\lib;..\..\..\libs\Simple OpenGL Image Library\projects\VC9\Debug;..\..\..\libs\freeglut\lib;..\..\..\libs\glew-1.13.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freetype.lib;SOIL.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

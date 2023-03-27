@@ -34,31 +34,17 @@ void Menu::update(int deltaTime) {
 	switch (cursor)
 	{
 	case CursorType::PLAY:
-		cursorSprite->setPosition(glm::vec2(260, 220));
+		cursorSprite->setPosition(glm::vec2(240, 190));
 		break;
 	case CursorType::INSTRUCTIONS:
-		cursorSprite->setPosition(glm::vec2(505, 310));
+		cursorSprite->setPosition(glm::vec2(485, 270));
 		break;
 	case CursorType::CREDITS:
-		cursorSprite->setPosition(glm::vec2(415, 380));
-		break;
-	case CursorType::EXIT:
-		cursorSprite->setPosition(glm::vec2(200, 430));
+		cursorSprite->setPosition(glm::vec2(370, 345));
 		break;
 	default:
 		break;
 	}
-
-	if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
-		--cursor;
-		if (cursor < 0) cursor = -3 * cursor;
-	}
-
-	if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
-		++cursor;
-	}
-
-	cursor = cursor % 4;
 
 	cursorSprite->update(deltaTime);
 
@@ -115,4 +101,6 @@ int Menu::getCursor() {
 
 void Menu::setCursor(int c) {
 	cursor = c;
+	if (cursor < 0) cursor = -2 * cursor;
+	cursor = cursor % 3;
 }

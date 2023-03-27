@@ -41,12 +41,15 @@ public:
 
 	std::map<pair<int, int>, bool>& getFloor();
 	vector<pair<int, int>>& getLavaMap();
-	
+
+	int checkTile(int x, int y);
+	bool collidable(int tile, bool jumping) const;
+
 private:
 	bool loadLevel(const string &levelFile);
 	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
 	void checkFloor(int x, int y);
-	bool collidable(int tile, bool jumping) const;
+	
 
 private:
 	GLuint vao;

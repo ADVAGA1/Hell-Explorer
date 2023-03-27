@@ -1,7 +1,7 @@
 #include "Door.h"
 
 #define HITBOX_X 32
-#define HITBOX_Y 57
+#define HITBOX_Y 32
 #define OFFSET_X 34
 #define OFFSET_Y 7
 
@@ -12,13 +12,13 @@ enum DoorAnims
 
 void Door::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 	spritesheet.loadFromFile("images/door.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(96, 64), glm::vec2(1.0f/4.0f, 1.f), &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(glm::ivec2(96, 48), glm::vec2(1.0f/4.0f, 1.f), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(2);
 
 	sprite->setAnimationSpeed(DOOR_CLOSED, 8);
 	sprite->addKeyframe(DOOR_CLOSED, glm::vec2(0.f, 0.f));
 
-	sprite->setAnimationSpeed(DOOR_OPEN, 4);
+	sprite->setAnimationSpeed(DOOR_OPEN, 7);
 	sprite->addKeyframe(DOOR_OPEN, glm::vec2(1.0f/4.0f, 0.f));
 	sprite->addKeyframe(DOOR_OPEN, glm::vec2(2.0f/4.0f, 0.f));
 	sprite->addKeyframe(DOOR_OPEN, glm::vec2(3.f / 4., 0.f));
