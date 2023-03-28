@@ -1,13 +1,26 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "Game.h"
+#include <iostream>
 
+Game::~Game() {
+	if (scene != NULL) delete scene;
+	if (menu != NULL) delete menu;
+	if (soundEngine != NULL) delete soundEngine;
+}
 
 void Game::init()
 {
 	bPlay = true;
 	globalScore = 0;
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
+
+	soundEngine = createIrrKlangDevice();
+
+	if (!soundEngine) cout << "Error: Sound engine not created." << endl;
+
+	soundEngine->play2D("sound/ophelia.mp3", true);
+
 	menu = new Menu();
 	menu->init();
 	//scene = new Scene();
@@ -170,7 +183,9 @@ bool Game::getSpecialKey(int key)
 	return specialKeys[key];
 }
 
-
+void Game::playSound(const char* path) {
+	soundEngine->play2D(path);
+}
 
 
 

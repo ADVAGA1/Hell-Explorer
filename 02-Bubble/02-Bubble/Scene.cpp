@@ -231,7 +231,6 @@ void Scene::init(int level, int score)
 	}
 
 	
-
 	spritesheet.loadFromFile("images/tileset.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	floorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.1, 0.1), &spritesheet, &texProgram);
 

@@ -4,17 +4,18 @@
 
 #include "Scene.h"
 #include "Menu.h"
+#include <irrKlang.h>
 
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 640 
+#define SCREEN_HEIGHT 480 
 
 enum class SceneType {
 	MENU, INSTRUCTIONS, CREDITS, LEVEL1, LEVEL2, LEVEL3
 };
 
 
-
+using namespace irrklang;
 
 // Game is a singleton (a class with a single instance) that represents our whole application
 
@@ -24,7 +25,7 @@ class Game
 
 private:
 	Game() {}
-	
+
 public:
 	static Game &instance()
 	{
@@ -32,6 +33,8 @@ public:
 	
 		return G;
 	}
+
+	~Game();
 	
 	void init();
 	bool update(int deltaTime);
@@ -49,6 +52,8 @@ public:
 	bool getKey(int key);
 	bool getSpecialKey(int key) ;
 
+	void playSound(const char* path);
+
 private:
 	bool bPlay;                       // Continue to play game?
 	Scene* scene;                      // Scene to render
@@ -57,6 +62,7 @@ private:
 	SceneType currentScene;
 	Menu* menu;
 	int globalScore;
+	ISoundEngine* soundEngine;
 
 };
 
