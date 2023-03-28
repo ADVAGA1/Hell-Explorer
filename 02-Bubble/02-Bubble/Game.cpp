@@ -10,38 +10,34 @@ void Game::init()
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
 	menu = new Menu();
 	menu->init();
-	scene = new Scene();
+	//scene = new Scene();
 	currentScene = SceneType::MENU;
 }
 
 bool Game::update(int deltaTime)
 {
-	switch (currentScene)
-	{
-	case SceneType::MENU:
-		menu->update(deltaTime);
-		break;
-	default:
-		scene->update(deltaTime);
-		break;
-	}
 
-	if (scene->hasLost()) {
-		currentScene = SceneType::MENU;
-	}
+	if (currentScene == SceneType::MENU || currentScene == SceneType::INSTRUCTIONS || currentScene == SceneType::CREDITS) menu->update(deltaTime);
+	else scene->update(deltaTime);
 
-	if (scene->hasWon()) {
-		globalScore += scene->getScore() - globalScore;
-		if (currentScene == SceneType::LEVEL1) {
-			currentScene = SceneType::LEVEL2;
-			scene->init(2,globalScore);
-		}
-		else if (currentScene == SceneType::LEVEL2) {
-			currentScene = SceneType::LEVEL3;
-			scene->init(3, globalScore);
-		}
-		else {
+	if (currentScene == SceneType::LEVEL1 || currentScene == SceneType::LEVEL2 || currentScene == SceneType::LEVEL3) {
+		if (scene->hasLost()) {
 			currentScene = SceneType::MENU;
+		}
+
+		if (scene->hasWon()) {
+			globalScore += scene->getScore() - globalScore;
+			if (currentScene == SceneType::LEVEL1) {
+				currentScene = SceneType::LEVEL2;
+				scene->init(2, globalScore);
+			}
+			else if (currentScene == SceneType::LEVEL2) {
+				currentScene = SceneType::LEVEL3;
+				scene->init(3, globalScore);
+			}
+			else {
+				currentScene = SceneType::MENU;
+			}
 		}
 	}
 
@@ -51,15 +47,9 @@ bool Game::update(int deltaTime)
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	switch (currentScene)
-	{
-	case SceneType::MENU:
-		menu->render();
-		break;
-	default:
-		scene->render();
-		break;
-	}
+	
+	if (currentScene == SceneType::MENU || currentScene == SceneType::INSTRUCTIONS || currentScene == SceneType::CREDITS) menu->render();
+	else scene->render();
 }
 
 void Game::keyPressed(int key)
@@ -72,15 +62,35 @@ void Game::keyPressed(int key)
 			
 			if (cursor == 0) {
 				currentScene = SceneType::LEVEL1;
+				scene = new Scene();
 				scene->init(1, 0);
 			}
-			else if (cursor == 1) {}
-			else {}
+			else if (cursor == 1) {
+				currentScene = SceneType::INSTRUCTIONS;
+				menu->setScene(1);
+			}
+			else {
+				currentScene = SceneType::CREDITS;
+				menu->setScene(3);
+			}
 		}
 	}
 	else if (currentScene == SceneType::INSTRUCTIONS) {
+		if (key == 'm' || key == 'M') {
+			currentScene = SceneType::MENU;
+			menu->setScene(0);
+		}
+		
+		if (key == 'c' || key == 'C') {
+			menu->setScene(2);
+		}
 	}
-	else if(currentScene == SceneType::CREDITS){}
+	else if(currentScene == SceneType::CREDITS){
+		if (key == 'm' || key == 'M') {
+			currentScene = SceneType::MENU;
+			menu->setScene(0);
+		}
+	}
 	else {
 		if (key == 'r' || key == 'R') {
 			if (currentScene == SceneType::LEVEL1) scene->init(1, globalScore);

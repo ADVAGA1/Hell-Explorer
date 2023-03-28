@@ -9,15 +9,6 @@
 #define SCREEN_X 32
 #define SCREEN_Y 32
 
-#define INIT_COIN_X_TILES 12
-#define INIT_COIN_Y_TILES 24
-
-#define INIT_KEY_X_TILES 4
-#define INIT_KEY_Y_TILES 24
-
-#define INIT_CHRONO_X_TILES 8
-#define INIT_CHRONO_Y_TILES 12
-
 
 #define DMG_TIME 3
 #define TIME 61
@@ -35,6 +26,7 @@ Scene::Scene()
 	chrono = NULL;
 	background = NULL;
 	heart = NULL;
+	clock = NULL;
 
 	for (auto& l : lavas) l = NULL;
 
@@ -60,6 +52,7 @@ Scene::~Scene()
 	if (door != NULL) delete door;
 	if (key != NULL) delete key;
 	if (chrono != NULL) delete chrono;
+	if (clock != NULL) delete clock;
 	if (heart != NULL) {
 		heart->free();
 		delete heart;
@@ -81,6 +74,7 @@ void Scene::cleanScene() {
 	chrono = NULL;
 	background = NULL;
 	heart = NULL;
+	clock = NULL;
 
 	for (auto& l : lavas) l = NULL;
 	for (auto& e : enemies) e = NULL;
@@ -603,9 +597,9 @@ void Scene::render()
 
 	player->render();
 	
-	text.render(to_string(timer/1000), glm::vec2(640 / 2, 8 + 16), 16, glm::vec4(1, 1, 1, 1));
-	text.render(to_string(score), glm::vec2(640 / 2 - 180, 8 + 16), 16, glm::vec4(1, 1, 1, 1));
-	text.render("Stage  " + to_string(scene), glm::vec2(640 / 2 + 180, 8 + 16), 16, glm::vec4(1, 1, 1, 1));
+	text.render(to_string(timer/1000), glm::vec2(640 / 2, 8 + 16), 24, glm::vec4(1, 1, 1, 1));
+	text.render(to_string(score), glm::vec2(640 / 2 - 180, 8 + 16), 24, glm::vec4(1, 1, 1, 1));
+	text.render("Stage  " + to_string(scene), glm::vec2(640 / 2 + 180, 8 + 16), 24, glm::vec4(1, 1, 1, 1));
 }
 
 void Scene::initShaders()

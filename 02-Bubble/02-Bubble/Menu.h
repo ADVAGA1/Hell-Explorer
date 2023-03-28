@@ -8,6 +8,10 @@ enum CursorType {
 	PLAY, INSTRUCTIONS, CREDITS
 };
 
+enum MenuType {
+	MENU, INSTRUCTIONS_MENU, CONTROLS_MENU, CREDITS_MENU
+};
+
 
 class Menu
 {
@@ -21,19 +25,31 @@ public:
 
 	int getCursor();
 	void setCursor(int c);
+	void setScene(int scene);
 
 private:
 
 	void initShaders();
 
-	Texture backgroundTex;
+	Texture menuTex;
 	ShaderProgram texProgram;
-	Sprite* background;
+	Sprite* menu;
 	glm::mat4 projection;
+
+	Texture instructionsTex;
+	Sprite* instructions;
+
+	Texture creditsTex;
+	Sprite* credits;
+
+	Texture controlsTex;
+	Sprite* controls;
 
 	int cursor;
 	Texture cursorTexture;
 	Sprite* cursorSprite;
+
+	int currentScene;
 
 	float currentTime;
 };

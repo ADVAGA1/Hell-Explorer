@@ -4,15 +4,27 @@
 #include "Game.h"
 #include <GL/glut.h>
 
+
 Menu::~Menu() {
-	if (background != NULL) delete background;
+	if (menu != NULL) delete menu;
+	if (instructions != NULL) delete instructions;
+	if (credits != NULL) delete credits;
 	if(cursorSprite != NULL) delete cursorSprite;
 }
 
 void Menu::init() {
 	initShaders();
-	backgroundTex.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	background = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &backgroundTex, &texProgram);
+	menuTex.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	menu = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &menuTex, &texProgram);
+
+	instructionsTex.loadFromFile("images/instructions.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	instructions = Sprite::createSprite(glm::vec2(528, SCREEN_HEIGHT), glm::vec2(1, 1), &instructionsTex, &texProgram);
+
+	controlsTex.loadFromFile("images/controls.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	controls = Sprite::createSprite(glm::vec2(528, SCREEN_HEIGHT), glm::vec2(1, 1), &controlsTex, &texProgram);
+
+	creditsTex.loadFromFile("images/credits.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	credits = Sprite::createSprite(glm::vec2(528, SCREEN_HEIGHT), glm::vec2(1, 1), &creditsTex, &texProgram);
 
 	cursorTexture.loadFromFile("images/cursor.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	cursorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.25f,1.f), &cursorTexture, &texProgram);
@@ -28,6 +40,7 @@ void Menu::init() {
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	cursor = CursorType::PLAY;
+	currentScene = MENU;
 
 	currentTime = 0.f;
 }
@@ -36,23 +49,25 @@ void Menu::update(int deltaTime) {
 
 	currentTime += deltaTime;
 
-	switch (cursor)
-	{
-	case CursorType::PLAY:
-		cursorSprite->setPosition(glm::vec2(90, 198));
-		break;
-	case CursorType::INSTRUCTIONS:
-		cursorSprite->setPosition(glm::vec2(90, 265));
-		break;
-	case CursorType::CREDITS:
-		cursorSprite->setPosition(glm::vec2(90, 345));
-		break;
-	default:
-		break;
+	if (currentScene == MENU) {
+
+		switch (cursor)
+		{
+		case CursorType::PLAY:
+			cursorSprite->setPosition(glm::vec2(90, 198));
+			break;
+		case CursorType::INSTRUCTIONS:
+			cursorSprite->setPosition(glm::vec2(90, 265));
+			break;
+		case CursorType::CREDITS:
+			cursorSprite->setPosition(glm::vec2(90, 345));
+			break;
+		default:
+			break;
+		}
+
+		cursorSprite->update(deltaTime);
 	}
-
-	cursorSprite->update(deltaTime);
-
 }
 
 void Menu::render() {
@@ -66,8 +81,22 @@ void Menu::render() {
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
-	background->render();
-	cursorSprite->render();
+	switch (currentScene) {
+	case MENU:
+		menu->render();
+		break;
+	case INSTRUCTIONS_MENU :
+		instructions->render();
+		break;
+	case CONTROLS_MENU:
+		controls->render();
+		break;
+	case CREDITS_MENU:
+		credits->render();
+		break;
+	}
+	
+	if(currentScene == MENU) cursorSprite->render();
 }
 
 void Menu::initShaders()
@@ -108,4 +137,8 @@ void Menu::setCursor(int c) {
 	cursor = c;
 	if (cursor < 0) cursor = -2 * cursor;
 	cursor = cursor % 3;
+}
+
+void Menu::setScene(int scene) {
+	currentScene = scene;
 }
