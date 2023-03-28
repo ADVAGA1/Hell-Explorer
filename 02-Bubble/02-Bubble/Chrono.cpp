@@ -5,7 +5,7 @@
 #define HITBOX_Y 16
 
 void Chrono::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
-	spritesheet.loadFromFile("images/chrono.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	spritesheet.loadFromFile("images/stopwatch.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(1.0f, 1.0f), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(1);
 

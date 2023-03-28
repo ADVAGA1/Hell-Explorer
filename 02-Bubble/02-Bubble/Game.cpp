@@ -4,8 +4,6 @@
 #include <iostream>
 
 Game::~Game() {
-	if (scene != NULL) delete scene;
-	if (menu != NULL) delete menu;
 	if (soundEngine != NULL) delete soundEngine;
 }
 
@@ -19,26 +17,26 @@ void Game::init()
 
 	if (!soundEngine) cout << "Error: Sound engine not created." << endl;
 
-	soundEngine->play2D("sound/ophelia.mp3", true);
-
+	//soundEngine->play2D("sound/ophelia.mp3", true);
+	scene = NULL;
 	menu = new Menu();
 	menu->init();
-	//scene = new Scene();
 	currentScene = SceneType::MENU;
 }
 
 bool Game::update(int deltaTime)
 {
-
 	if (currentScene == SceneType::MENU || currentScene == SceneType::INSTRUCTIONS || currentScene == SceneType::CREDITS) menu->update(deltaTime);
 	else scene->update(deltaTime);
 
 	if (currentScene == SceneType::LEVEL1 || currentScene == SceneType::LEVEL2 || currentScene == SceneType::LEVEL3) {
 		if (scene->hasLost()) {
+			delete scene;
+			menu = new Menu();
+			menu->init();
 			currentScene = SceneType::MENU;
 		}
-
-		if (scene->hasWon()) {
+		else if (scene->hasWon()) {
 			globalScore += scene->getScore() - globalScore;
 			if (currentScene == SceneType::LEVEL1) {
 				currentScene = SceneType::LEVEL2;
@@ -49,6 +47,9 @@ bool Game::update(int deltaTime)
 				scene->init(3, globalScore);
 			}
 			else {
+				delete scene;
+				menu = new Menu();
+				menu->init();
 				currentScene = SceneType::MENU;
 			}
 		}
@@ -60,23 +61,24 @@ bool Game::update(int deltaTime)
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	if (currentScene == SceneType::MENU || currentScene == SceneType::INSTRUCTIONS || currentScene == SceneType::CREDITS) menu->render();
 	else scene->render();
 }
 
 void Game::keyPressed(int key)
 {
-	if(key == 27) bPlay = false; // Escape code
+	if (key == 27) bPlay = false; // Escape code
 
-	if(currentScene == SceneType::MENU){
+	if (currentScene == SceneType::MENU) {
 		if (key == 13) {  // Enter code
 			int cursor = menu->getCursor();
-			
+
 			if (cursor == 0) {
 				currentScene = SceneType::LEVEL1;
 				scene = new Scene();
 				scene->init(1, 0);
+				delete menu;
 			}
 			else if (cursor == 1) {
 				currentScene = SceneType::INSTRUCTIONS;
@@ -93,12 +95,12 @@ void Game::keyPressed(int key)
 			currentScene = SceneType::MENU;
 			menu->setScene(0);
 		}
-		
+
 		if (key == 'c' || key == 'C') {
 			menu->setScene(2);
 		}
 	}
-	else if(currentScene == SceneType::CREDITS){
+	else if (currentScene == SceneType::CREDITS) {
 		if (key == 'm' || key == 'M') {
 			currentScene = SceneType::MENU;
 			menu->setScene(0);
@@ -116,23 +118,20 @@ void Game::keyPressed(int key)
 
 	if (key == '1') {
 		currentScene = SceneType::LEVEL1;
-		delete scene;
-		scene = new Scene();
-		scene->init(1,globalScore);
+		if (scene == NULL) scene = new Scene();
+		scene->init(1, globalScore);
 	}
 	if (key == '2') {
 		currentScene = SceneType::LEVEL2;
-		delete scene;
-		scene = new Scene();
+		if (scene == NULL) scene = new Scene();
 		scene->init(2, globalScore);
 	}
 	if (key == '3') {
 		currentScene = SceneType::LEVEL3;
-		delete scene;
-		scene = new Scene();
+		if (scene == NULL) scene = new Scene();
 		scene->init(3, globalScore);
 	}
-	
+
 	keys[key] = true;
 }
 
@@ -173,7 +172,7 @@ void Game::mouseRelease(int button)
 {
 }
 
-bool Game::getKey(int key) 
+bool Game::getKey(int key)
 {
 	return keys[key];
 }

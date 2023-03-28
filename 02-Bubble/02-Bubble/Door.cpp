@@ -45,3 +45,7 @@ void Door::openDoor() {
 void Door::update(int deltaTime) {
 	sprite->updateLoopless(deltaTime);
 }
+
+void Door::closeDoor() {
+	sprite->changeAnimation(DOOR_CLOSED);
+}

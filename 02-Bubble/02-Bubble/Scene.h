@@ -50,7 +50,6 @@ public:
 private:
 	void initShaders();
 	void reset();
-	void cleanScene();
 
 private:
 	int scene;

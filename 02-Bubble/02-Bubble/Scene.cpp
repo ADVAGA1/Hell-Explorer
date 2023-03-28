@@ -17,22 +17,47 @@
 
 Scene::Scene()
 {
+	initShaders();
+	
 	map = NULL;
-	player = NULL;
-	floorSprite = NULL;
-	coin = NULL;
-	key = NULL;
-	door = NULL;
-	chrono = NULL;
+	
+	player = new Player();
+	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	
+	spritesheet.loadFromFile("images/tileset.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	floorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.1, 0.1), &spritesheet, &texProgram);
+
+	floorSprite->setNumberAnimations(1);
+	floorSprite->setAnimationSpeed(0, 8);
+	floorSprite->addKeyframe(0, glm::vec2(0.2f, 0.f));
+	floorSprite->changeAnimation(0);
+
+	coin = new Coin();
+	coin->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
+	key = new Key();
+	key->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
+	door = new Door();
+	door->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	
+	chrono = new Chrono();
+	chrono->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
 	background = NULL;
-	heart = NULL;
-	clock = NULL;
+	
+	heartTexture.loadFromFile("images/heart.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	heart = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(1, 1), &heartTexture, &texProgram);
+	heart->setNumberAnimations(1);
+	heart->setAnimationSpeed(0, 8);
+	heart->addKeyframe(0, glm::vec2(0, 0));
+	heart->changeAnimation(0);
+
+	clock = new Clock();
+	clock->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	for (auto& l : lavas) l = NULL;
 
-	keyTaken = false;
-	openDoor = false;
-	coinTaken = false;
 }
 
 Scene::~Scene()
@@ -45,7 +70,6 @@ Scene::~Scene()
 		if (e != NULL) delete e;
 	}
 	if (floorSprite != NULL) {
-		floorSprite->free();
 		delete floorSprite;
 	}
 	if (coin != NULL) delete coin;
@@ -54,7 +78,6 @@ Scene::~Scene()
 	if (chrono != NULL) delete chrono;
 	if (clock != NULL) delete clock;
 	if (heart != NULL) {
-		heart->free();
 		delete heart;
 	}
 	for (auto& l : lavas) {
@@ -63,39 +86,20 @@ Scene::~Scene()
 	if (background != NULL) delete background;
 }
 
-void Scene::cleanScene() {
-
-	map = NULL;
-	player = NULL;
-	floorSprite = NULL;
-	coin = NULL;
-	key = NULL;
-	door = NULL;
-	chrono = NULL;
-	background = NULL;
-	heart = NULL;
-	clock = NULL;
-
-	for (auto& l : lavas) l = NULL;
-	for (auto& e : enemies) e = NULL;
-
-	keyTaken = false;
-	openDoor = false;
-	coinTaken = false;
-}
 
 void Scene::init(int level, int score)
 {
-	initShaders();
-	cleanScene();
 
 	scene = level;
 	this->score = score;
+
+	if (background != NULL) delete background;
 
 	switch (scene) {
 	case 1:
 		map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
+		enemies.clear();
 		enemies = vector<Enemy*>(4);
 
 		enemies[0] = new Skeleton(true);
@@ -118,8 +122,6 @@ void Scene::init(int level, int score)
 		enemies[3]->setPosition(glm::vec2(8 * map->getTileSize(), 12 * map->getTileSize()));
 		enemies[3]->setTileMap(map);
 
-		player = new Player();
-		player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		player->setPosition(glm::vec2(6 * map->getTileSize(), 4 * map->getTileSize()));
 		player->setTileMap(map);
 
@@ -127,14 +129,14 @@ void Scene::init(int level, int score)
 		background = Sprite::createSprite(glm::vec2(16 * 36, 16 * 28), glm::vec2(1, 1), &backgroundTexture, &texProgram);
 		background->setPosition(glm::vec2(SCREEN_X, SCREEN_Y));
 
-		door = new Door();
-		door->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		door->setPosition(glm::vec2(20 * map->getTileSize(), 3 * map->getTileSize()));
+		door->closeDoor();
 		door->setTileMap(map);
 		break;
 	case 2:
 		map = TileMap::createTileMap("levels/level02.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
+		enemies.clear();
 		enemies = vector<Enemy*>(7);
 
 		enemies[0] = new Skeleton(true);
@@ -172,8 +174,6 @@ void Scene::init(int level, int score)
 		enemies[6]->setPosition(glm::vec2(12 * map->getTileSize(), 4 * map->getTileSize()));
 		enemies[6]->setTileMap(map);
 
-		player = new Player();
-		player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		player->setPosition(glm::vec2(4 * map->getTileSize(), 24 * map->getTileSize()));
 		player->setTileMap(map);
 
@@ -181,14 +181,14 @@ void Scene::init(int level, int score)
 		background = Sprite::createSprite(glm::vec2(16 * 36, 16 * 28), glm::vec2(1, 1), &backgroundTexture, &texProgram);
 		background->setPosition(glm::vec2(SCREEN_X, SCREEN_Y));
 
-		door = new Door();
-		door->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		door->setPosition(glm::vec2(15 * map->getTileSize(), 3 * map->getTileSize()));
+		door->closeDoor();
 		door->setTileMap(map);
 		break;
 	case 3:
 		map = TileMap::createTileMap("levels/level03.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
+		enemies.clear();
 		enemies = vector<Enemy*>(4);
 
 		enemies[0] = new Skeleton(true);
@@ -211,8 +211,6 @@ void Scene::init(int level, int score)
 		enemies[3]->setPosition(glm::vec2(26 * map->getTileSize(), 20 * map->getTileSize()));
 		enemies[3]->setTileMap(map);
 
-		player = new Player();
-		player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		player->setPosition(glm::vec2(9 * map->getTileSize(), 4 * map->getTileSize()));
 		player->setTileMap(map);
 
@@ -220,47 +218,22 @@ void Scene::init(int level, int score)
 		background = Sprite::createSprite(glm::vec2(16 * 36, 16 * 28), glm::vec2(1, 1), &backgroundTexture, &texProgram);
 		background->setPosition(glm::vec2(SCREEN_X, SCREEN_Y));
 
-		door = new Door();
-		door->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		door->setPosition(glm::vec2(9 * map->getTileSize(), 23 * map->getTileSize()));
+		door->closeDoor();
 		door->setTileMap(map);
 
 		break;
 	default:
 		break;
 	}
-
 	
-	spritesheet.loadFromFile("images/tileset.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	floorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.1, 0.1), &spritesheet, &texProgram);
-
-	floorSprite->setNumberAnimations(1);
-	floorSprite->setAnimationSpeed(0, 8);
-	floorSprite->addKeyframe(0, glm::vec2(0.2f, 0.f));
-	floorSprite->changeAnimation(0);
-	
-	coin = new Coin();
-	coin->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	coin->setTileMap(map);
 	
-	key = new Key();
-	key->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	key->setTileMap(map);
 
-	chrono = new Chrono();
-	chrono->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	chrono->setTileMap(map);
 
-	clock = new Clock();
-	clock->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	clock->setTileMap(map);
-
-	heartTexture.loadFromFile("images/heart.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	heart = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(1, 1), &heartTexture, &texProgram);
-	heart->setNumberAnimations(1);
-	heart->setAnimationSpeed(0, 8);
-	heart->addKeyframe(0, glm::vec2(0, 0));
-	heart->changeAnimation(0);
 
 	vector<pair<int, int>> lavaMap = map->getLavaMap();
 	lavas.clear();
@@ -318,7 +291,6 @@ bool Scene::collisionPlayerEnemy(Player* player, Enemy* enemy) {
 	glm::ivec2 boundingBoxMaxEnemy = enemy->getBoundingBoxMax();
 	glm::ivec2 boundingBoxMinEnemy = enemy->getBoundingBoxMin();
 
-	
 	if (boundingBoxMinPlayer.x < boundingBoxMaxEnemy.x && boundingBoxMinEnemy.x < boundingBoxMaxPlayer.x && boundingBoxMinPlayer.y < boundingBoxMaxEnemy.y && boundingBoxMinEnemy.y < boundingBoxMaxPlayer.y) return true;
 	return false;
 }
@@ -328,7 +300,6 @@ bool Scene::collisionPlayerItem(Player* player, Item* item) {
 	glm::ivec2 boundingBoxMinPlayer = player->getBoundingBoxMin();
 	glm::ivec2 boundingBoxMaxItem = item->getBoundingBoxMax();
 	glm::ivec2 boundingBoxMinItem = item->getBoundingBoxMin();
-
 
 	if (boundingBoxMinPlayer.x < boundingBoxMaxItem.x && boundingBoxMinItem.x < boundingBoxMaxPlayer.x && boundingBoxMinPlayer.y < boundingBoxMaxItem.y && boundingBoxMinItem.y < boundingBoxMaxPlayer.y) return true;
 	return false;

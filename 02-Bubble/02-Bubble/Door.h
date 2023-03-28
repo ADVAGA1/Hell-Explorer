@@ -12,5 +12,6 @@ public:
 	glm::ivec2 getBoundingBoxMin() override;
 
 	void openDoor();
+	void closeDoor();
 };
 

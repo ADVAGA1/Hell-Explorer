@@ -26,6 +26,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	bJumping = false;
 	godMode = false;
 	invulnerable = false;
+	goLeft = false;
 	spritesheet.loadFromFile("images/player.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0/8.0, 0.20), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(12);
@@ -114,7 +115,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(4.0f / 8.0f, 0.6f));
 		sprite->addKeyframe(DAMAGED_MOVE_LEFT, glm::vec2(5.0f / 8.0f, 0.6f));
 		
-	sprite->changeAnimation(0);
+	sprite->changeAnimation(1);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 	
