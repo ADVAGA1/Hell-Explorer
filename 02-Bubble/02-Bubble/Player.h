@@ -14,9 +14,11 @@ class Player
 {
 
 public:
-	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
+	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram, int nLives);
 	void update(int deltaTime);
 	void render();
+
+	void updateSprite(int deltaTime);
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
@@ -32,6 +34,7 @@ public:
 	void setGodMode(bool b);
 
 	void changeInvulnerable(bool inv);
+	void end();
 	
 private:
 	bool bJumping;
@@ -42,6 +45,9 @@ private:
 	TileMap *map;
 	int lives;
 	bool godMode, invulnerable, goLeft;
+	int runTimer;
+	bool spawning, ending;
+	int spawnTimer;
 
 };
 

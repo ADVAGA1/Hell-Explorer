@@ -32,8 +32,8 @@ public:
 	
 	int getTileSize() const { return tileSize; }
 
-	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping) const;
-	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping) const;
+	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping, bool ghost = false) const;
+	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping, bool ghost = false) const;
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool player);
 	bool collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, bool jumping);
 
@@ -43,7 +43,7 @@ public:
 	vector<pair<int, int>>& getLavaMap();
 
 	int checkTile(int x, int y);
-	bool collidable(int tile, bool jumping) const;
+	bool collidable(int tile, bool jumping,bool ghost = false) const;
 
 private:
 	bool loadLevel(const string &levelFile);

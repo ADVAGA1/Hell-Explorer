@@ -29,7 +29,8 @@ void Ghost::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
     sprite->addKeyframe(MOVE_RIGHT, glm::vec2(2.0f / 4.0f, 1.0f / 2.0f));
     sprite->addKeyframe(MOVE_RIGHT, glm::vec2(3.0f / 4.0f, 1.0f / 2.0f));
 
-    sprite->changeAnimation(0);
+    if (goLeft) sprite->changeAnimation(MOVE_LEFT);
+    else sprite->changeAnimation(MOVE_RIGHT);
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
@@ -51,14 +52,14 @@ void Ghost::update(int deltaTime) {
     }
 
     if (goLeft) {
-        if (!map->collisionMoveLeft(posEnemy, glm::ivec2(HITBOX_X, HITBOX_Y), false)) {
+        if (!map->collisionMoveLeft(posEnemy, glm::ivec2(HITBOX_X, HITBOX_Y), false, true)) {
             if (sprite->animation() != MOVE_LEFT) sprite->changeAnimation(MOVE_LEFT);
             posEnemy.x -= 1;
         }
         else goLeft = !goLeft;
     }
     else {
-        if (!map->collisionMoveRight(posEnemy, glm::ivec2(HITBOX_X + 1, HITBOX_Y), false)) {
+        if (!map->collisionMoveRight(posEnemy, glm::ivec2(HITBOX_X + 1, HITBOX_Y), false, true)) {
             if (sprite->animation() != MOVE_RIGHT) sprite->changeAnimation(MOVE_RIGHT);
             posEnemy.x += 1;
         }

@@ -8,8 +8,12 @@
 #define TIME 5  //en segundos
 #define LAVA 20
 
+enum VampireState {
+    VAMPIRE, BAT, CHANGE
+};
+
 enum VampireAnims {
-    MOVE_LEFT, MOVE_RIGHT, FLY_RIGHT, FLY_LEFT
+    MOVE_LEFT, MOVE_RIGHT, FLY_RIGHT, FLY_LEFT, TRANSFORM
 };
 
 Vampire::Vampire(bool left) {
@@ -18,42 +22,52 @@ Vampire::Vampire(bool left) {
 
 void Vampire::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
     spritesheet.loadFromFile("images/vampire.png", TEXTURE_PIXEL_FORMAT_RGBA);
-    sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0f / 5.0f, 1.0f / 4.0f), &spritesheet, &shaderProgram);
+    sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0f / 5.0f, 1.0f / 5.0f), &spritesheet, &shaderProgram);
     sprite->setNumberAnimations(4);
 
     sprite->setAnimationSpeed(MOVE_RIGHT, 8);
-    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.0f / 5.0f, 1.0f / 4.0f));
-    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(1.0f / 5.0f, 1.0f / 4.0f));
-    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(2.0f / 5.0f, 1.0f / 4.0f));
-    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(3.0f / 5.0f, 1.0f / 4.0f));
-    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(4.0f / 5.0f, 1.0f / 4.0f));
+    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.0f / 5.0f, 1.0f / 5.0f));
+    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(1.0f / 5.0f, 1.0f / 5.0f));
+    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(2.0f / 5.0f, 1.0f / 5.0f));
+    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(3.0f / 5.0f, 1.0f / 5.0f));
+    sprite->addKeyframe(MOVE_RIGHT, glm::vec2(4.0f / 5.0f, 1.0f / 5.0f));
 
     sprite->setAnimationSpeed(MOVE_LEFT, 8);
-    sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.0f / 5.0f, 0.0f / 4.0f));
-    sprite->addKeyframe(MOVE_LEFT, glm::vec2(1.0f / 5.0f, 0.0f / 4.0f));
-    sprite->addKeyframe(MOVE_LEFT, glm::vec2(2.0f / 5.0f, 0.0f / 4.0f));
-    sprite->addKeyframe(MOVE_LEFT, glm::vec2(3.0f / 5.0f, 0.0f / 4.0f));
-    sprite->addKeyframe(MOVE_LEFT, glm::vec2(4.0f / 5.0f, 0.0f / 4.0f));
+    sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.0f / 5.0f, 0.0f / 5.0f));
+    sprite->addKeyframe(MOVE_LEFT, glm::vec2(1.0f / 5.0f, 0.0f / 5.0f));
+    sprite->addKeyframe(MOVE_LEFT, glm::vec2(2.0f / 5.0f, 0.0f / 5.0f));
+    sprite->addKeyframe(MOVE_LEFT, glm::vec2(3.0f / 5.0f, 0.0f / 5.0f));
+    sprite->addKeyframe(MOVE_LEFT, glm::vec2(4.0f / 5.0f, 0.0f / 5.0f));
 
     sprite->setAnimationSpeed(FLY_LEFT, 8);
-    sprite->addKeyframe(FLY_LEFT, glm::vec2(0.0f / 5.0f, 2.0f / 4.0f));
-    sprite->addKeyframe(FLY_LEFT, glm::vec2(1.0f / 5.0f, 2.0f / 4.0f));
-    sprite->addKeyframe(FLY_LEFT, glm::vec2(2.0f / 5.0f, 2.0f / 4.0f));
-    sprite->addKeyframe(FLY_LEFT, glm::vec2(3.0f / 5.0f, 2.0f / 4.0f));
+    sprite->addKeyframe(FLY_LEFT, glm::vec2(0.0f / 5.0f, 2.0f / 5.0f));
+    sprite->addKeyframe(FLY_LEFT, glm::vec2(1.0f / 5.0f, 2.0f / 5.0f));
+    sprite->addKeyframe(FLY_LEFT, glm::vec2(2.0f / 5.0f, 2.0f / 5.0f));
+    sprite->addKeyframe(FLY_LEFT, glm::vec2(3.0f / 5.0f, 2.0f / 5.0f));
 
     sprite->setAnimationSpeed(FLY_RIGHT, 8);
-    sprite->addKeyframe(FLY_RIGHT, glm::vec2(0.0f / 5.0f, 3.0f / 4.0f));
-    sprite->addKeyframe(FLY_RIGHT, glm::vec2(1.0f / 5.0f, 3.0f / 4.0f));
-    sprite->addKeyframe(FLY_RIGHT, glm::vec2(2.0f / 5.0f, 3.0f / 4.0f));
-    sprite->addKeyframe(FLY_RIGHT, glm::vec2(3.0f / 5.0f, 3.0f / 4.0f));
+    sprite->addKeyframe(FLY_RIGHT, glm::vec2(0.0f / 5.0f, 3.0f / 5.0f));
+    sprite->addKeyframe(FLY_RIGHT, glm::vec2(1.0f / 5.0f, 3.0f / 5.0f));
+    sprite->addKeyframe(FLY_RIGHT, glm::vec2(2.0f / 5.0f, 3.0f / 5.0f));
+    sprite->addKeyframe(FLY_RIGHT, glm::vec2(3.0f / 5.0f, 3.0f / 5.0f));
 
-    sprite->changeAnimation(0);
+    sprite->setAnimationSpeed(TRANSFORM, 8);
+    sprite->addKeyframe(TRANSFORM, glm::vec2(0.0f / 5.0f, 3.0f / 5.0f));
+    sprite->addKeyframe(TRANSFORM, glm::vec2(1.0f / 5.0f, 3.0f / 5.0f));
+    sprite->addKeyframe(TRANSFORM, glm::vec2(2.0f / 5.0f, 3.0f / 5.0f));
+    sprite->addKeyframe(TRANSFORM, glm::vec2(3.0f / 5.0f, 3.0f / 5.0f));
+
+
+    if (goLeft) sprite->changeAnimation(MOVE_LEFT);
+    else sprite->changeAnimation(MOVE_RIGHT);
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
     isBat = false;
     goUp = true;
     isLanding = false;
     timer = TIME * 1000;
+    transformTimer = 200;
+    currentState = VAMPIRE;
 }
 
 void Vampire::update(int deltaTime) {
@@ -62,12 +76,20 @@ void Vampire::update(int deltaTime) {
     timer -= deltaTime;
 
     if (timer <= 0) {
+
         if (isBat) {
             isLanding = true;
         }
         else {
-            isBat = true;
-            timer = TIME * 1000;
+            if (transformTimer <= 0) {
+                isBat = true;
+                timer = TIME * 1000;
+                transformTimer = 200;
+            }
+            
+            transformTimer -= deltaTime;
+            sprite->changeAnimation(TRANSFORM);
+
         }
     }
 
@@ -118,6 +140,7 @@ void Vampire::update(int deltaTime) {
             if (nextTile == 2) {
                 isLanding = false;
                 isBat = false;
+                sprite->changeAnimation(TRANSFORM);
                 posEnemy.y -= SLIME_HITBOX_Y - BAT_HITBOX_Y;
                 timer = TIME * 1000;
             }

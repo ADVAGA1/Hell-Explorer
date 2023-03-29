@@ -6,12 +6,16 @@
 #include "Scene.h"
 
 
+enum GameState {
+	START, PLAYING, WIN, LOSE
+};
+
 #define SCREEN_X 32
 #define SCREEN_Y 32
 
 
 #define DMG_TIME 3
-#define TIME 61
+#define TIME 60
 #define CHRONO_TIME 5
 
 
@@ -22,7 +26,7 @@ Scene::Scene()
 	map = NULL;
 	
 	player = new Player();
-	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram,5);
 	
 	spritesheet.loadFromFile("images/tileset.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	floorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.1, 0.1), &spritesheet, &texProgram);
@@ -58,6 +62,9 @@ Scene::Scene()
 
 	for (auto& l : lavas) l = NULL;
 
+	heartGiven = false;
+
+
 }
 
 Scene::~Scene()
@@ -84,6 +91,7 @@ Scene::~Scene()
 		if (l != NULL) delete l;
 	}
 	if (background != NULL) delete background;
+	if (borde != NULL) delete borde;
 }
 
 
@@ -95,6 +103,8 @@ void Scene::init(int level, int score)
 
 	if (background != NULL) delete background;
 
+	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, player->getLives());
+
 	switch (scene) {
 	case 1:
 		map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -104,7 +114,7 @@ void Scene::init(int level, int score)
 
 		enemies[0] = new Skeleton(true);
 		enemies[0]->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		enemies[0]->setPosition(glm::vec2(6 * map->getTileSize(), 24 * map->getTileSize()));
+		enemies[0]->setPosition(glm::vec2(7 * map->getTileSize(), 24 * map->getTileSize()));
 		enemies[0]->setTileMap(map);
 
 		enemies[1] = new Skeleton(false);
@@ -119,7 +129,7 @@ void Scene::init(int level, int score)
 
 		enemies[3] = new Vampire(false);
 		enemies[3]->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		enemies[3]->setPosition(glm::vec2(8 * map->getTileSize(), 12 * map->getTileSize()));
+		enemies[3]->setPosition(glm::vec2(9 * map->getTileSize() - (32-24), 12 * map->getTileSize()));
 		enemies[3]->setTileMap(map);
 
 		player->setPosition(glm::vec2(6 * map->getTileSize(), 4 * map->getTileSize()));
@@ -129,9 +139,16 @@ void Scene::init(int level, int score)
 		background = Sprite::createSprite(glm::vec2(16 * 36, 16 * 28), glm::vec2(1, 1), &backgroundTexture, &texProgram);
 		background->setPosition(glm::vec2(SCREEN_X, SCREEN_Y));
 
+		bordeTexture.loadFromFile("images/borde1.png", TEXTURE_PIXEL_FORMAT_RGBA);
+		borde = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &bordeTexture, &texProgram);
+		borde->setPosition(glm::vec2(0, 0));
+
 		door->setPosition(glm::vec2(20 * map->getTileSize(), 3 * map->getTileSize()));
 		door->closeDoor();
 		door->setTileMap(map);
+
+		Game::instance().playTheme("sound/level1_theme.mp3");
+
 		break;
 	case 2:
 		map = TileMap::createTileMap("levels/level02.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -166,7 +183,7 @@ void Scene::init(int level, int score)
 
 		enemies[5] = new Ghost(true);
 		enemies[5]->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		enemies[5]->setPosition(glm::vec2(30 * map->getTileSize(), 3 * map->getTileSize()));
+		enemies[5]->setPosition(glm::vec2(31 * map->getTileSize(), 3 * map->getTileSize()));
 		enemies[5]->setTileMap(map);
 
 		enemies[6] = new Vampire(false);
@@ -181,9 +198,16 @@ void Scene::init(int level, int score)
 		background = Sprite::createSprite(glm::vec2(16 * 36, 16 * 28), glm::vec2(1, 1), &backgroundTexture, &texProgram);
 		background->setPosition(glm::vec2(SCREEN_X, SCREEN_Y));
 
+		bordeTexture.loadFromFile("images/borde2.png", TEXTURE_PIXEL_FORMAT_RGBA);
+		borde = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &bordeTexture, &texProgram);
+		borde->setPosition(glm::vec2(0, 0));
+
 		door->setPosition(glm::vec2(15 * map->getTileSize(), 3 * map->getTileSize()));
 		door->closeDoor();
 		door->setTileMap(map);
+
+		Game::instance().playTheme("sound/level2_theme.mp3");
+
 		break;
 	case 3:
 		map = TileMap::createTileMap("levels/level03.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -203,7 +227,7 @@ void Scene::init(int level, int score)
 
 		enemies[2] = new Vampire(false);
 		enemies[2]->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		enemies[2]->setPosition(glm::vec2(11 * map->getTileSize(), 20 * map->getTileSize()));
+		enemies[2]->setPosition(glm::vec2(9 * map->getTileSize() - (32-24), 20 * map->getTileSize()));
 		enemies[2]->setTileMap(map);
 
 		enemies[3] = new Vampire(true);
@@ -211,7 +235,7 @@ void Scene::init(int level, int score)
 		enemies[3]->setPosition(glm::vec2(26 * map->getTileSize(), 20 * map->getTileSize()));
 		enemies[3]->setTileMap(map);
 
-		player->setPosition(glm::vec2(9 * map->getTileSize(), 4 * map->getTileSize()));
+		player->setPosition(glm::vec2(11 * map->getTileSize(), 4 * map->getTileSize()));
 		player->setTileMap(map);
 
 		backgroundTexture.loadFromFile("images/background3.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -221,6 +245,12 @@ void Scene::init(int level, int score)
 		door->setPosition(glm::vec2(9 * map->getTileSize(), 23 * map->getTileSize()));
 		door->closeDoor();
 		door->setTileMap(map);
+
+		bordeTexture.loadFromFile("images/borde3.png", TEXTURE_PIXEL_FORMAT_RGBA);
+		borde = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &bordeTexture, &texProgram);
+		borde->setPosition(glm::vec2(0, 0));
+
+		Game::instance().playTheme("sound/level3_theme.mp3");
 
 		break;
 	default:
@@ -251,7 +281,7 @@ void Scene::init(int level, int score)
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 
-	if (!text.init("fonts/Minecraft.ttf")) cout << "Could not load font!!!" << endl;
+	if (!text.init("fonts/game_over.ttf")) cout << "Could not load font!!!" << endl;
 
 	keyTaken = false;
 	openDoor = false;
@@ -269,9 +299,9 @@ void Scene::init(int level, int score)
 	damaged = false;
 	win = false;
 	lose = false;
+	first = true;
 	chronoTimer = CHRONO_TIME * 1000;
 	timer = TIME * 1000;
-	lastTime = timer;
 
 	auto& floor = map->getFloor();
 	floorCheck = vector<pair<pair<int,int>, bool>>(floor.size());
@@ -281,6 +311,11 @@ void Scene::init(int level, int score)
 		floorCheck[i] = { {f.first.first,f.first.second},false };
 		++i;
 	}
+
+	currentState = START;
+	startTimer = 3 * 1000;
+	loseTimer = 5 * 1000;
+	winTimer = 5 * 1000;
 
 }
 
@@ -310,183 +345,255 @@ void Scene::update(int deltaTime)
 
 	currentTime += deltaTime;
 
-	if(!isStoped) timer -= deltaTime;
+	if (currentState == START) {
 
-	//Coin timer
-	if (!coinSpawn && timer <= (TIME - 5) * 1000) {
-		switch (scene)
-		{
-		case 1:
-			coin->setPosition(glm::vec2(12 * map->getTileSize(), 24 * map->getTileSize()));
-			break;
-		case 2:
-			coin->setPosition(glm::vec2(10 * map->getTileSize(), 16 * map->getTileSize()));
-			break;
-		case 3:
-			coin->setPosition(glm::vec2(28 * map->getTileSize(), 24 * map->getTileSize()));
-			break;
-		default:
-			break;
+		if (startTimer < 0) {
+			currentState = PLAYING;
+			borde->free();
 		}
-		coinSpawn = true;
-	}
 
-	if (coinSpawn && timer <= (TIME - 25) * 1000) {
-		coinTaken = true;
-		coin->setPosition(glm::vec2(0, 0));
+		startTimer -= deltaTime;
 	}
+	else if (currentState == PLAYING) {
 
-	//Chrono timer
-	if (timer <= (TIME - 10) * 1000 && !chronoSpawn) {
-		switch (scene)
-		{
-		case 1:
-			chrono->setPosition(glm::vec2(8 * map->getTileSize(), 12 * map->getTileSize()));
-			break;
-		case 2:
-			chrono->setPosition(glm::vec2(28 * map->getTileSize(), 16 * map->getTileSize()));
-			break;
-		case 3:
-			chrono->setPosition(glm::vec2(23 * map->getTileSize(), 16 * map->getTileSize()));
-			break;
-		default:
-			break;
+		if (!isStoped) timer -= deltaTime;
+
+		if (!heartGiven) {
+			if (score >= 5000) {
+				player->setLives(player->getLives() + 1);
+				heartGiven = true;
+			}
+
 		}
-		chronoSpawn = true;
-	}
 
-	if (chronoSpawn && timer <= (TIME - 30) * 1000) {
-		chronoTaken = true;
-		chrono->setPosition(glm::vec2(0, 0));
-	}
-
-	//Clock timer
-	if (timer <= (TIME - 30) * 1000 && !clockSpawn) {
-		switch (scene)
-		{
-		case 1:
-			clock->setPosition(glm::vec2(23 * map->getTileSize(), 24 * map->getTileSize()));
-			break;
-		case 2:
-			clock->setPosition(glm::vec2(28 * map->getTileSize(), 24 * map->getTileSize()));
-			break;
-		case 3:
-			clock->setPosition(glm::vec2(22 * map->getTileSize(), 4 * map->getTileSize()));
-			break;
-		default:
-			break;
+		//Coin timer
+		if (!coinSpawn && timer <= (TIME - 5) * 1000) {
+			switch (scene)
+			{
+			case 1:
+				coin->setPosition(glm::vec2(12 * map->getTileSize(), 24 * map->getTileSize()));
+				break;
+			case 2:
+				coin->setPosition(glm::vec2(10 * map->getTileSize(), 16 * map->getTileSize()));
+				break;
+			case 3:
+				coin->setPosition(glm::vec2(28 * map->getTileSize(), 24 * map->getTileSize()));
+				break;
+			default:
+				break;
+			}
+			coinSpawn = true;
 		}
-		clockSpawn = true;
-	}
 
-	if (clockSpawn && timer <= (TIME - 45) * 1000) {
-		clockTaken = true;
-		clock->setPosition(glm::vec2(0, 0));
-	}
+		if (coinSpawn && timer <= (TIME - 25) * 1000) {
+			coinTaken = true;
+			coin->setPosition(glm::vec2(0, 0));
+		}
 
-	//1 second decrement
-	if (lastTime - timer >= 1000) {
-		lastTime = timer;
-	}
+		//Chrono timer
+		if (timer <= (TIME - 10) * 1000 && !chronoSpawn) {
+			switch (scene)
+			{
+			case 1:
+				chrono->setPosition(glm::vec2(8 * map->getTileSize(), 12 * map->getTileSize()));
+				break;
+			case 2:
+				chrono->setPosition(glm::vec2(28 * map->getTileSize(), 16 * map->getTileSize()));
+				break;
+			case 3:
+				chrono->setPosition(glm::vec2(23 * map->getTileSize(), 16 * map->getTileSize()));
+				break;
+			default:
+				break;
+			}
+			chronoSpawn = true;
+		}
 
-	//time over
-	if (timer <= 0) lose = true;
+		if (chronoSpawn && timer <= (TIME - 30) * 1000) {
+			chronoTaken = true;
+			chrono->setPosition(glm::vec2(0, 0));
+		}
 
-	//got damaged
-	if (damaged) {
-		damageTimer = DMG_TIME * 1000;
-		damaged = false;
-		hasBeenDamaged = true;
-		player->changeInvulnerable(true);
-	}
+		//Clock timer
+		if (timer <= (TIME - 30) * 1000 && !clockSpawn) {
+			switch (scene)
+			{
+			case 1:
+				clock->setPosition(glm::vec2(23 * map->getTileSize(), 24 * map->getTileSize()));
+				break;
+			case 2:
+				clock->setPosition(glm::vec2(28 * map->getTileSize(), 24 * map->getTileSize()));
+				break;
+			case 3:
+				clock->setPosition(glm::vec2(22 * map->getTileSize(), 4 * map->getTileSize()));
+				break;
+			default:
+				break;
+			}
+			clockSpawn = true;
+		}
 
-	if(hasBeenDamaged) damageTimer -= deltaTime;
+		if (keySpawn && first) {
+			switch (scene) {
+			case 1:
+				key->setPosition(glm::vec2(4 * map->getTileSize(), 24 * map->getTileSize()));
+				break;
+			case 2:
+				key->setPosition(glm::vec2(17 * map->getTileSize(), 11 * map->getTileSize()));
+				break;
+			case 3:
+				key->setPosition(glm::vec2(25 * map->getTileSize(), 24 * map->getTileSize()));
+				break;
+			}
+			Game::instance().playSound("sound/key.wav");
+			first = false;
+		}
 
-	if (hasBeenDamaged && damageTimer <= 0) {
-		hasBeenDamaged = false;
-		player->changeInvulnerable(false);
-	}
 
-	if (isStoped) chronoTimer -= deltaTime;
+		if (clockSpawn && timer <= (TIME - 45) * 1000) {
+			clockTaken = true;
+			clock->setPosition(glm::vec2(0, 0));
+		}
 
-	if (chronoTimer <= 0) {
-		isStoped = false;
-		chronoTimer = CHRONO_TIME * 1000;
-	}
+		//time over
+		if (timer <= 0) lose = true;
 
-	//collision with enemies
-	for (auto& enemy : enemies) {
-		if (collisionPlayerEnemy(player, enemy) && !player->isGodMode()) {
-			if (!hasBeenDamaged) {
-				if (player->getLives() == 1) {
-					lose = true;
+		//got damaged
+		if (damaged) {
+			damageTimer = DMG_TIME * 1000;
+			damaged = false;
+			hasBeenDamaged = true;
+			player->changeInvulnerable(true);
+		}
+
+		if (hasBeenDamaged) damageTimer -= deltaTime;
+
+		if (hasBeenDamaged && damageTimer <= 0) {
+			hasBeenDamaged = false;
+			player->changeInvulnerable(false);
+		}
+
+		if (isStoped) chronoTimer -= deltaTime;
+
+		if (chronoTimer <= 0) {
+			isStoped = false;
+			chronoTimer = CHRONO_TIME * 1000;
+		}
+
+		//collision with enemies
+		for (auto& enemy : enemies) {
+			if (collisionPlayerEnemy(player, enemy) && !player->isGodMode()) {
+				if (!hasBeenDamaged) {
+					if (player->getLives() == 1) {
+						lose = true;
+						Game::instance().playSound("sound/playerKilled.wav");
+					}
+					else {
+						player->setLives(player->getLives() - 1);
+						Game::instance().playSound("sound/playerHit.wav");
+					}
+					damaged = true;
 				}
-				else player->setLives(player->getLives() - 1);
-				damaged = true;
+				break;
 			}
 		}
-	}
 
-	//collision with lava
-	for (auto& lava: lavas) {
-		if (collisionPlayerEnemy(player, lava) && !player->isGodMode()) {
-			if (!hasBeenDamaged) {
-				if (player->getLives() == 1) {
-					lose = true;
+		//collision with lava
+		for (auto& lava : lavas) {
+			if (collisionPlayerEnemy(player, lava) && !player->isGodMode()) {
+				if (!hasBeenDamaged) {
+					if (player->getLives() == 1) {
+						lose = true;
+						Game::instance().playSound("sound/playerKilled.wav");
+					}
+					else
+					{
+						player->setLives(player->getLives() - 1);
+						Game::instance().playSound("sound/playerHit.wav");
+					}
+					damaged = true;
 				}
-				else player->setLives(player->getLives() - 1);
-				damaged = true;
+				break;
 			}
-			break;
 		}
+
+		//collision with key
+		if (keySpawn && collisionPlayerItem(player, key)) {
+			keyTaken = true;
+			door->openDoor();
+			Game::instance().playSound("sound/doorOpen.wav");
+			key->setPosition(glm::ivec2(0, 0));
+		}
+
+		//collision with chrono
+		if (chronoSpawn && collisionPlayerItem(player, chrono)) {
+			isStoped = true;
+			chronoTaken = true;
+			chrono->setPosition(glm::ivec2(0, 0));
+			Game::instance().playSound("sound/stopwatch.wav");
+		}
+
+		//collision with coin
+		if (coinSpawn && collisionPlayerItem(player, coin)) {
+			coinTaken = true;
+			score += 500;
+			coin->setPosition(glm::vec2(0, 0));
+			Game::instance().playSound("sound/grabCoin.wav");
+		}
+
+		//collision with clock
+		if (clockSpawn && collisionPlayerItem(player, clock)) {
+			clockTaken = true;
+			timer += 30 * 1000;
+			clock->setPosition(glm::vec2(0, 0));
+			Game::instance().playSound("sound/clock.wav");
+		}
+
+		//collision with door
+		if (keyTaken && collisionPlayerItem(player, door)) {
+			currentState = WIN;
+			timer = timer - timer % 1000;
+			player->end();
+		}
+
+		player->update(deltaTime);
+
+		if (!isStoped) {
+			for (auto& enemy : enemies)
+				enemy->update(deltaTime);
+		}
+
+		if (!coinTaken) coin->update(deltaTime);
+
+		door->update(deltaTime);
+
+		for (auto& l : lavas) {
+			l->update(deltaTime);
+		}
+
 	}
+	else if(currentState == WIN){
 
-	//collision with key
-	if (keySpawn && collisionPlayerItem(player, key)) {
-		keyTaken = true;
-		door->openDoor();
-		key->setPosition(glm::ivec2(0, 0));
+		player->updateSprite(deltaTime);
+
+		if (winTimer == 5000) Game::instance().playSound("sound/win.wav");
+			
+		if (winTimer > 2000) winTimer -= deltaTime;
+
+		if (timer <= 0) winTimer -= deltaTime;
+		else {
+			timer -=  500;
+			if (timer % 1000 == 0) {
+				score += 10;
+				Game::instance().playSound("sound/timePoints.wav");
+			}
+		}
+
+		if (winTimer <= 0) win = true;
+
 	}
+	else {
 
-	//collision with chrono
-	if (chronoSpawn && collisionPlayerItem(player, chrono)) {
-		isStoped = true;
-		chronoTaken = true;
-		chrono->setPosition(glm::ivec2(0, 0));
-	}
-
-	//collision with coin
-	if (coinSpawn && collisionPlayerItem(player, coin)) {
-		coinTaken = true;
-		score += 500;
-		coin->setPosition(glm::vec2(0, 0));
-	}
-
-	//collision with clock
-	if (clockSpawn && collisionPlayerItem(player, clock)) {
-		clockTaken = true;
-		timer += 30 * 1000;
-		clock->setPosition(glm::vec2(0, 0));
-	}
-
-	//collision with door
-	if (keyTaken && collisionPlayerItem(player, door)) {
-		win = true;
-	}
-
-	player->update(deltaTime);
-
-	if (!isStoped) {
-		for (auto& enemy : enemies)
-			enemy->update(deltaTime);
-	}
-	
-	if(!coinTaken) coin->update(deltaTime);
-
-	door->update(deltaTime);
-
-	for (auto& l : lavas) {
-		l->update(deltaTime);
 	}
 
 }
@@ -525,6 +632,8 @@ void Scene::render()
 	if (chronoSpawn && !chronoTaken) chrono->render();
 
 	if (clockSpawn && !clockTaken) clock->render();
+
+	if (keySpawn && !keyTaken) key->render();
 	
 	auto& floor = map->getFloor();
 	int changedFloors = floor.size();
@@ -547,26 +656,13 @@ void Scene::render()
 
 	if (changedFloors == 0) keySpawn = true;
 
-	if (keySpawn && !keyTaken) {
-		key->render();
-		switch (scene) {
-		case 1:
-			key->setPosition(glm::vec2(4 * map->getTileSize(), 24 * map->getTileSize()));
-			break;
-		case 2:
-			key->setPosition(glm::vec2(17 * map->getTileSize(), 11 * map->getTileSize()));
-			break;
-		case 3:
-			key->setPosition(glm::vec2(25 * map->getTileSize(), 24 * map->getTileSize()));
-			break;
-		}
-	}
-
 	for (auto& enemy : enemies)
 		enemy->render();
 
-	player->render();
-	
+	if(currentState != START) player->render();
+
+	if (currentState == START) borde->render();
+
 	text.render(to_string(timer/1000), glm::vec2(640 / 2, 8 + 16), 24, glm::vec4(1, 1, 1, 1));
 	text.render(to_string(score), glm::vec2(640 / 2 - 180, 8 + 16), 24, glm::vec4(1, 1, 1, 1));
 	text.render("Stage  " + to_string(scene), glm::vec2(640 / 2 + 180, 8 + 16), 24, glm::vec4(1, 1, 1, 1));

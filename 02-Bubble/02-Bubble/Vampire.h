@@ -16,6 +16,6 @@ public:
 
 private:
 	bool isBat, goLeft, goUp, isLanding;
-	int timer;
+	int timer, transformTimer, currentState;
 };
 

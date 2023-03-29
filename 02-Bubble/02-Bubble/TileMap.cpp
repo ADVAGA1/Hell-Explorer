@@ -159,7 +159,7 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 // Method collisionMoveDown also corrects Y coordinate if the box is
 // already intersecting a tile below.
 
-bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping) const
+bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping, bool ghost) const
 {
 	int x, y0, y1;
 	
@@ -170,14 +170,14 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size, b
 	{
 		int tile = map[y * mapSize.x + x];
 		
-		if(collidable(tile, jumping))
+		if(collidable(tile, jumping, ghost))
 			return true;
 	}
 	
 	return false;
 }
 
-bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping) const
+bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size, bool jumping, bool ghost) const
 {
 	int x, y0, y1;
 	
@@ -188,7 +188,7 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size, 
 	{
 		int tile = map[y * mapSize.x + x];
 
-		if (collidable(tile, jumping))
+		if (collidable(tile, jumping, ghost))
 			return true;
 	}
 	
@@ -250,9 +250,12 @@ std::map<pair<int,int>,bool>& TileMap::getFloor() {
 	return floor;
 }
 
-bool TileMap::collidable(int tile, bool jumping) const {
-	if (jumping) return tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == PILAR;
-	return tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == PILAR || tile == CHANGEABLE_TILE;
+bool TileMap::collidable(int tile, bool jumping, bool ghost) const {
+	bool result;
+	if (jumping) result = tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == PILAR;
+	else if (ghost) result = tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == CHANGEABLE_TILE;
+	else result = tile == WALL_LEFT || tile == WALL_RIGHT || tile == ROOF || tile == PILAR || tile == CHANGEABLE_TILE;
+	return result;
 }
 
 vector<pair<int,int>>& TileMap::getLavaMap() {

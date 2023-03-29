@@ -70,16 +70,17 @@ private:
 	Door* door;
 	bool openDoor, keyTaken, coinTaken, keySpawn, isStoped, chronoTaken, coinSpawn, chronoSpawn, clockSpawn, clockTaken;
 	vector<Lava*> lavas;
-	Sprite* heart;
-	Texture heartTexture;
+	Sprite* heart, *borde;
+	Texture heartTexture, bordeTexture;
 	int damageTimer;
 	bool hasBeenDamaged, damaged;
-	int timer, lastTime;
+	int timer;
 	Text text;
 	int score;
 	vector<pair<pair<int,int>, bool>> floorCheck;
 	int chronoTimer;
-	bool win, lose;
+	bool win, lose,first, heartGiven;
+	int currentState, startTimer, winTimer, loseTimer;
 
 };
 

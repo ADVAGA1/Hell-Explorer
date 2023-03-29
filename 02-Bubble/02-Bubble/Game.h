@@ -53,6 +53,7 @@ public:
 	bool getSpecialKey(int key) ;
 
 	void playSound(const char* path);
+	void playTheme(const char* path);
 
 private:
 	bool bPlay;                       // Continue to play game?

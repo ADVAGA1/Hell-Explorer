@@ -18,13 +18,13 @@ void Menu::init() {
 	menu = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &menuTex, &texProgram);
 
 	instructionsTex.loadFromFile("images/instructions.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	instructions = Sprite::createSprite(glm::vec2(528, SCREEN_HEIGHT), glm::vec2(1, 1), &instructionsTex, &texProgram);
+	instructions = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &instructionsTex, &texProgram);
 
 	controlsTex.loadFromFile("images/controls.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	controls = Sprite::createSprite(glm::vec2(528, SCREEN_HEIGHT), glm::vec2(1, 1), &controlsTex, &texProgram);
+	controls = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &controlsTex, &texProgram);
 
 	creditsTex.loadFromFile("images/credits.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	credits = Sprite::createSprite(glm::vec2(528, SCREEN_HEIGHT), glm::vec2(1, 1), &creditsTex, &texProgram);
+	credits = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &creditsTex, &texProgram);
 
 	cursorTexture.loadFromFile("images/cursor.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	cursorSprite = Sprite::createSprite(glm::vec2(16, 16), glm::vec2(0.25f,1.f), &cursorTexture, &texProgram);
@@ -43,6 +43,8 @@ void Menu::init() {
 	currentScene = MENU;
 
 	currentTime = 0.f;
+
+	Game::instance().playTheme("sound/menu_theme.mp3");
 }
 
 void Menu::update(int deltaTime) {
@@ -54,13 +56,13 @@ void Menu::update(int deltaTime) {
 		switch (cursor)
 		{
 		case CursorType::PLAY:
-			cursorSprite->setPosition(glm::vec2(90, 198));
+			cursorSprite->setPosition(glm::vec2(80, 198));
 			break;
 		case CursorType::INSTRUCTIONS:
-			cursorSprite->setPosition(glm::vec2(90, 265));
+			cursorSprite->setPosition(glm::vec2(80, 270));
 			break;
 		case CursorType::CREDITS:
-			cursorSprite->setPosition(glm::vec2(90, 345));
+			cursorSprite->setPosition(glm::vec2(80, 358));
 			break;
 		default:
 			break;

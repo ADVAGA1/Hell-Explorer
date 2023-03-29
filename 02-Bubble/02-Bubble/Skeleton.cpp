@@ -39,7 +39,8 @@ void Skeleton::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) 
 	sprite->addKeyframe(MOVE_LEFT, glm::vec2(6.0f/8.0f, 1.0f/2.0f));
 	sprite->addKeyframe(MOVE_LEFT, glm::vec2(7.f/8.f, 1.0f/2.0f));
 
-	sprite->changeAnimation(0);
+	if (goLeft) sprite->changeAnimation(MOVE_LEFT);
+	else sprite->changeAnimation(MOVE_RIGHT);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }

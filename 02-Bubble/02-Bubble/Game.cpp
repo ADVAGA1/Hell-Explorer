@@ -4,7 +4,9 @@
 #include <iostream>
 
 Game::~Game() {
-	if (soundEngine != NULL) delete soundEngine;
+	if (soundEngine != NULL) soundEngine->drop();
+	if (scene != NULL) delete scene;
+	if (menu != NULL) delete menu;
 }
 
 void Game::init()
@@ -17,8 +19,9 @@ void Game::init()
 
 	if (!soundEngine) cout << "Error: Sound engine not created." << endl;
 
-	//soundEngine->play2D("sound/ophelia.mp3", true);
-	scene = NULL;
+	soundEngine->setSoundVolume(0.25f);
+
+	scene = nullptr;
 	menu = new Menu();
 	menu->init();
 	currentScene = SceneType::MENU;
@@ -32,6 +35,7 @@ bool Game::update(int deltaTime)
 	if (currentScene == SceneType::LEVEL1 || currentScene == SceneType::LEVEL2 || currentScene == SceneType::LEVEL3) {
 		if (scene->hasLost()) {
 			delete scene;
+			scene = nullptr;
 			menu = new Menu();
 			menu->init();
 			currentScene = SceneType::MENU;
@@ -48,6 +52,7 @@ bool Game::update(int deltaTime)
 			}
 			else {
 				delete scene;
+				scene = nullptr;
 				menu = new Menu();
 				menu->init();
 				currentScene = SceneType::MENU;
@@ -79,6 +84,7 @@ void Game::keyPressed(int key)
 				scene = new Scene();
 				scene->init(1, 0);
 				delete menu;
+				menu = nullptr;
 			}
 			else if (cursor == 1) {
 				currentScene = SceneType::INSTRUCTIONS;
@@ -118,17 +124,17 @@ void Game::keyPressed(int key)
 
 	if (key == '1') {
 		currentScene = SceneType::LEVEL1;
-		if (scene == NULL) scene = new Scene();
+		if (scene == nullptr) scene = new Scene();
 		scene->init(1, globalScore);
 	}
 	if (key == '2') {
 		currentScene = SceneType::LEVEL2;
-		if (scene == NULL) scene = new Scene();
+		if (scene == nullptr) scene = new Scene();
 		scene->init(2, globalScore);
 	}
 	if (key == '3') {
 		currentScene = SceneType::LEVEL3;
-		if (scene == NULL) scene = new Scene();
+		if (scene == nullptr) scene = new Scene();
 		scene->init(3, globalScore);
 	}
 
@@ -183,7 +189,15 @@ bool Game::getSpecialKey(int key)
 }
 
 void Game::playSound(const char* path) {
+	soundEngine->setSoundVolume(0.4f);
 	soundEngine->play2D(path);
+	soundEngine->setSoundVolume(0.25f);
+}
+
+void Game::playTheme(const char* path) {
+	soundEngine->stopAllSounds();
+	soundEngine->play2D(path, true);
+	//soundEngine->setSoundVolume(0.25f);
 }
 
 
