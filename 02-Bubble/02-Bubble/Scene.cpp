@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "Game.h"
 #include "Scene.h"
+#include <GL/glut.h>
 
 
 enum GameState {
@@ -140,7 +141,7 @@ void Scene::init(int level, int score)
 		background->setPosition(glm::vec2(SCREEN_X, SCREEN_Y));
 
 		bordeTexture.loadFromFile("images/borde1.png", TEXTURE_PIXEL_FORMAT_RGBA);
-		borde = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &bordeTexture, &texProgram);
+		borde = Sprite::createSprite(glm::vec2(Game::instance().getWindowWidth(), Game::instance().getWindowHeight()), glm::vec2(1, 1), &bordeTexture, &texProgram);
 		borde->setPosition(glm::vec2(0, 0));
 
 		door->setPosition(glm::vec2(20 * map->getTileSize(), 3 * map->getTileSize()));
@@ -199,7 +200,7 @@ void Scene::init(int level, int score)
 		background->setPosition(glm::vec2(SCREEN_X, SCREEN_Y));
 
 		bordeTexture.loadFromFile("images/borde2.png", TEXTURE_PIXEL_FORMAT_RGBA);
-		borde = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &bordeTexture, &texProgram);
+		borde = Sprite::createSprite(glm::vec2(Game::instance().getWindowWidth(), Game::instance().getWindowHeight()), glm::vec2(1, 1), &bordeTexture, &texProgram);
 		borde->setPosition(glm::vec2(0, 0));
 
 		door->setPosition(glm::vec2(15 * map->getTileSize(), 3 * map->getTileSize()));
@@ -247,7 +248,7 @@ void Scene::init(int level, int score)
 		door->setTileMap(map);
 
 		bordeTexture.loadFromFile("images/borde3.png", TEXTURE_PIXEL_FORMAT_RGBA);
-		borde = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1, 1), &bordeTexture, &texProgram);
+		borde = Sprite::createSprite(glm::vec2(Game::instance().getWindowWidth(), Game::instance().getWindowHeight()), glm::vec2(1, 1), &bordeTexture, &texProgram);
 		borde->setPosition(glm::vec2(0, 0));
 
 		Game::instance().playTheme("sound/level3_theme.mp3");
@@ -278,7 +279,7 @@ void Scene::init(int level, int score)
 
 
 
-	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
+	projection = glm::ortho(0.f, float(Game::instance().getWindowWidth() - 1), float(Game::instance().getWindowHeight() - 1), 0.f);
 	currentTime = 0.0f;
 
 	if (!text.init("fonts/game_over.ttf")) cout << "Could not load font!!!" << endl;
@@ -314,7 +315,7 @@ void Scene::init(int level, int score)
 
 	currentState = START;
 	startTimer = 3 * 1000;
-	loseTimer = 5 * 1000;
+	loseTimer = 3 * 1000;
 	winTimer = 5 * 1000;
 
 }
@@ -362,6 +363,7 @@ void Scene::update(int deltaTime)
 			if (score >= 5000) {
 				player->setLives(player->getLives() + 1);
 				heartGiven = true;
+				Game::instance().playSound("sound/getHeart.wav");
 			}
 
 		}
@@ -456,7 +458,11 @@ void Scene::update(int deltaTime)
 		}
 
 		//time over
-		if (timer <= 0) lose = true;
+		if (timer <= 0) {
+			currentState = LOSE;
+			player->end(true);
+			Game::instance().playSound("sound/playerKilled.wav");
+		}
 
 		//got damaged
 		if (damaged) {
@@ -485,7 +491,8 @@ void Scene::update(int deltaTime)
 			if (collisionPlayerEnemy(player, enemy) && !player->isGodMode()) {
 				if (!hasBeenDamaged) {
 					if (player->getLives() == 1) {
-						lose = true;
+						currentState = LOSE;
+						player->end(true);
 						Game::instance().playSound("sound/playerKilled.wav");
 					}
 					else {
@@ -503,7 +510,8 @@ void Scene::update(int deltaTime)
 			if (collisionPlayerEnemy(player, lava) && !player->isGodMode()) {
 				if (!hasBeenDamaged) {
 					if (player->getLives() == 1) {
-						lose = true;
+						currentState = LOSE;
+						player->end(true);
 						Game::instance().playSound("sound/playerKilled.wav");
 					}
 					else
@@ -553,7 +561,7 @@ void Scene::update(int deltaTime)
 		if (keyTaken && collisionPlayerItem(player, door)) {
 			currentState = WIN;
 			timer = timer - timer % 1000;
-			player->end();
+			player->end(false);
 		}
 
 		player->update(deltaTime);
@@ -593,7 +601,11 @@ void Scene::update(int deltaTime)
 
 	}
 	else {
+		player->updateSprite(deltaTime);
 
+		loseTimer -= deltaTime;
+
+		if (loseTimer <= 0) lose = true;
 	}
 
 }
@@ -661,11 +673,18 @@ void Scene::render()
 
 	if(currentState != START) player->render();
 
-	if (currentState == START) borde->render();
+	int screenW = glutGet(GLUT_WINDOW_WIDTH);
+	int screenH = glutGet(GLUT_WINDOW_HEIGHT);
 
-	text.render(to_string(timer/1000), glm::vec2(640 / 2, 8 + 16), 24, glm::vec4(1, 1, 1, 1));
-	text.render(to_string(score), glm::vec2(640 / 2 - 180, 8 + 16), 24, glm::vec4(1, 1, 1, 1));
-	text.render("Stage  " + to_string(scene), glm::vec2(640 / 2 + 180, 8 + 16), 24, glm::vec4(1, 1, 1, 1));
+	cout << screenW << " " << screenH << endl;
+
+	if (currentState == START) text.render("Stage " + to_string(scene), glm::vec2(screenW/2 - screenW/6, screenH / 2), screenW/8, glm::vec4(1, 1, 1, 1));
+
+	if (currentState == LOSE) text.render("GAME OVER",glm::vec2(screenW/2 - screenW / 6, screenH/2), screenW/8 ,glm::vec4(1,1,1,1));
+
+	text.render(to_string(timer/1000), glm::vec2(screenW/2, screenH/16), (screenW) / 20, glm::vec4(1, 1, 1, 1));
+	text.render(to_string(score), glm::vec2(screenW/2 - screenW/4, (screenH)/16), (screenW)/20, glm::vec4(1, 1, 1, 1));
+	text.render("Stage  " + to_string(scene), glm::vec2(screenW/2 + screenW/4, (screenH)/16), (screenW)/20, glm::vec4(1, 1, 1, 1));
 }
 
 void Scene::initShaders()

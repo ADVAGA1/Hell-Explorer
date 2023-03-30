@@ -34,7 +34,7 @@ public:
 	void setGodMode(bool b);
 
 	void changeInvulnerable(bool inv);
-	void end();
+	void end(bool dead);
 	
 private:
 	bool bJumping;

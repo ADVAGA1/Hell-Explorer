@@ -16,7 +16,7 @@
 
 enum PlayerAnims
 {
-	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, JUMPING_UP_R, JUMPING_DOWN_R, JUMPING_UP_L, JUMPING_DOWN_L, DAMAGED_RIGHT, DAMAGED_LEFT, DAMAGED_MOVE_RIGHT, DAMAGED_MOVE_LEFT, SPAWN
+	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, JUMPING_UP_R, JUMPING_DOWN_R, JUMPING_UP_L, JUMPING_DOWN_L, DAMAGED_RIGHT, DAMAGED_LEFT, DAMAGED_MOVE_RIGHT, DAMAGED_MOVE_LEFT, SPAWN, KILLED
 };
 
 void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram, int nLives)
@@ -28,7 +28,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram, in
 	goLeft = false;
 	spritesheet.loadFromFile("images/player.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1.0/8.0, 0.20), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(13);
+	sprite->setNumberAnimations(14);
 	
 		sprite->setAnimationSpeed(STAND_LEFT, 6);
 		sprite->addKeyframe(STAND_LEFT, glm::vec2(0.f, 0.2f));
@@ -121,6 +121,16 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram, in
 		sprite->addKeyframe(SPAWN, glm::vec2(3.0f / 8.0f, 0.8f));
 		sprite->addKeyframe(SPAWN, glm::vec2(4.0f / 8.0f, 0.8f));
 		sprite->addKeyframe(SPAWN, glm::vec2(7.0f / 8.0f, 0.8f));
+
+		sprite->setAnimationSpeed(KILLED, 6);
+		sprite->addKeyframe(KILLED, glm::vec2(6.0f / 8.0f, 0.6f));
+		sprite->addKeyframe(KILLED, glm::vec2(7.0f / 8.0f, 0.6f));
+		sprite->addKeyframe(KILLED, glm::vec2(0.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(KILLED, glm::vec2(1.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(KILLED, glm::vec2(2.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(KILLED, glm::vec2(3.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(KILLED, glm::vec2(4.0f / 8.0f, 0.8f));
+		sprite->addKeyframe(KILLED, glm::vec2(7.0f / 8.0f, 0.8f));
 
 		
 	sprite->changeAnimation(SPAWN);
@@ -217,7 +227,7 @@ void Player::update(int deltaTime)
 
 		if (bJumping)
 		{
-			if (map->collisionMoveUp(posPlayer, glm::ivec2(HITBOX_X, HITBOX_Y), bJumping)) {
+			if (map->collisionMoveUp(glm::ivec2(posPlayer.x,posPlayer.y), glm::ivec2(HITBOX_X, 1), bJumping)) {
 				bJumping = false;
 				posPlayer.y = startY;
 			}
@@ -256,7 +266,7 @@ void Player::update(int deltaTime)
 		}
 		sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 	}
-	else sprite->update(deltaTime);
+	
 }
 
 void Player::updateSprite(int deltaTime) {
@@ -319,8 +329,9 @@ void Player::setGodMode(bool b) {
 	godMode = b;
 }
 
-void Player::end() {
-	sprite->changeAnimation(SPAWN);
+void Player::end(bool dead) {
+	if (dead) sprite->changeAnimation(KILLED);
+	else sprite->changeAnimation(SPAWN);
 	ending = true;
 }
 

@@ -222,13 +222,13 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 }
 
 bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, bool jumping) {
-	int y0, y1, x;
+	int x0, x1, y;
 	bool result = false;
 
-	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
-	x = (pos.x + size.x - 1) / tileSize;
-	for (int y = y0; y <= y1; y++)
+	x0 = pos.x / tileSize;
+	x1 = (pos.x + size.x - 1) / tileSize;
+	y = (pos.y - size.y + 1) / tileSize;
+	for (int x = x0; x <= x1; x++)
 	{
 		int tile = map[y * mapSize.x + x];
 		if (collidable(tile,jumping)) result = true;

@@ -79,6 +79,11 @@ static void idleCallback()
 	}
 }
 
+static void reshapeCallback(int w, int h){
+	Game::instance().changeWindow(w, h);
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -97,6 +102,7 @@ int main(int argc, char **argv)
 	glutSpecialUpFunc(specialUpCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
+	//glutReshapeFunc(reshapeCallback);
 
 	// GLEW will take care of OpenGL extension functions
 	glewExperimental = GL_TRUE;

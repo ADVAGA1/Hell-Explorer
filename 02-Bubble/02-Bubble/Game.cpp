@@ -21,6 +21,9 @@ void Game::init()
 
 	soundEngine->setSoundVolume(0.25f);
 
+	windowHeight = SCREEN_HEIGHT;
+	windowWidth = SCREEN_WIDTH;
+
 	scene = nullptr;
 	menu = new Menu();
 	menu->init();
@@ -198,6 +201,19 @@ void Game::playTheme(const char* path) {
 	soundEngine->stopAllSounds();
 	soundEngine->play2D(path, true);
 	//soundEngine->setSoundVolume(0.25f);
+}
+
+void Game::changeWindow(int w, int h) {
+	windowWidth = w;
+	windowHeight = h;
+}
+
+int Game::getWindowHeight() {
+	return windowHeight;
+}
+
+int Game::getWindowWidth() {
+	return windowWidth;
 }
 
 

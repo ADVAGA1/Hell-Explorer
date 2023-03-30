@@ -48,12 +48,16 @@ public:
 	void mouseMove(int x, int y);
 	void mousePress(int button);
 	void mouseRelease(int button);
+	void changeWindow(int w, int h);
 	
 	bool getKey(int key);
 	bool getSpecialKey(int key) ;
 
 	void playSound(const char* path);
 	void playTheme(const char* path);
+
+	int getWindowWidth();
+	int getWindowHeight();
 
 private:
 	bool bPlay;                       // Continue to play game?
@@ -64,6 +68,8 @@ private:
 	Menu* menu;
 	int globalScore;
 	ISoundEngine* soundEngine;
+
+	int windowWidth, windowHeight;
 
 };
 

@@ -45,7 +45,7 @@ void Ghost::update(int deltaTime) {
         else goUp = !goUp;
     }
     else {
-        if (!map->collisionMoveUp(posEnemy, glm::ivec2(HITBOX_X, HITBOX_Y), false)) {
+        if (!map->collisionMoveUp(posEnemy, glm::ivec2(HITBOX_X, 1), false)) {
             posEnemy.y -= 1;
         }
         else goUp = !goUp;
