@@ -1,4 +1,2 @@
-# VJ
-videojuego 2d
-
-sound: irrKlang
+# Hell Explorer
+Videojuego 2d para la asignatura de VJ
